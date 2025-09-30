@@ -37,6 +37,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'inventario',
+    'proveedores',
+    'usuario',
+    'ventas',
+    'produccion',
 ]
 
 MIDDLEWARE = [
@@ -118,5 +123,9 @@ STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
+
+
+# Usar modelo de usuario personalizado
+AUTH_USER_MODEL = 'usuario.Usuario'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
