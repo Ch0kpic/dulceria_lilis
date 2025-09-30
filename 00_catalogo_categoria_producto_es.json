@@ -1,0 +1,48 @@
+[
+  {
+    "model": "inventario.category",
+    "pk": 1,
+    "fields": {
+      "nombre": "Alfajores",
+      "descripcion": "Alfajores artesanales y comerciales"
+    }
+  },
+  {
+    "model": "inventario.category",
+    "pk": 2,
+    "fields": {
+      "nombre": "Bebidas",
+      "descripcion": "Bebidas y refrescos"
+    }
+  },
+  {
+    "model": "inventario.product",
+    "pk": 1,
+    "fields": {
+      "nombre": "Alfajor de Dulce de Leche",
+      "sku": "SKU001",
+      "categoria": 1,
+      "descripcion": "Alfajor relleno de dulce de leche y cubierto de chocolate"
+    }
+  },
+  {
+    "model": "inventario.product",
+    "pk": 2,
+    "fields": {
+      "nombre": "Alfajor de Frambuesa",
+      "sku": "SKU002",
+      "categoria": 1,
+      "descripcion": "Alfajor relleno de mermelada de frambuesa"
+    }
+  },
+  {
+    "model": "inventario.product",
+    "pk": 3,
+    "fields": {
+      "nombre": "Refresco de Cola",
+      "sku": "SKU003",
+      "categoria": 2,
+      "descripcion": "Refresco sabor cola"
+    }
+  }
+]
