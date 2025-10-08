@@ -1,0 +1,18 @@
+[
+  {
+    "model": "roles.rol",
+    "pk": 1,
+    "fields": {
+      "nombre": "Operador de Bodega",
+      "descripcion": "Gestión de inventario, registrar entradas y salidas de productos, control de stock y ubicaciones"
+    }
+  },
+  {
+    "model": "roles.rol",
+    "pk": 2,
+    "fields": {
+      "nombre": "Comprador",
+      "descripcion": "Evaluar proveedores, crear solicitudes de compra, gestionar órdenes de compra"
+    }
+  }
+]
