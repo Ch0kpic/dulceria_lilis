@@ -156,41 +156,101 @@
 
                     <!-- Paginación -->
                     {% if page_obj.has_other_pages %}
-                    <nav aria-label="Paginación de productos">
-                        <ul class="pagination justify-content-center">
-                            {% if page_obj.has_previous %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?page=1{% if search %}&search={{ search }}{% endif %}{% if activo %}&activo={{ activo }}{% endif %}{% if precio_min %}&precio_min={{ precio_min }}{% endif %}{% if precio_max %}&precio_max={{ precio_max }}{% endif %}{% if orden %}&orden={{ orden }}{% endif %}">
-                                        <i class="fas fa-angle-double-left"></i>
-                                    </a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if activo %}&activo={{ activo }}{% endif %}{% if precio_min %}&precio_min={{ precio_min }}{% endif %}{% if precio_max %}&precio_max={{ precio_max }}{% endif %}{% if orden %}&orden={{ orden }}{% endif %}">
-                                        <i class="fas fa-angle-left"></i>
-                                    </a>
-                                </li>
-                            {% endif %}
+                    <div class="d-flex justify-content-between align-items-center mt-4">
+                        <div class="text-muted">
+                            <small>
+                                Mostrando productos {{ page_obj.start_index }} - {{ page_obj.end_index }} 
+                                de {{ page_obj.paginator.count }} total
+                            </small>
+                        </div>
+                        
+                        <nav aria-label="Paginación de productos">
+                            <ul class="pagination pagination-lg mb-0">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link px-3 py-2" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+                                           title="Primera página">
+                                            <i class="fas fa-angle-double-left"></i>
+                                            <span class="d-none d-sm-inline ms-1">Primera</span>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link px-3 py-2" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                           title="Página anterior">
+                                            <i class="fas fa-angle-left"></i>
+                                            <span class="d-none d-sm-inline ms-1">Anterior</span>
+                                        </a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link px-3 py-2 text-muted">
+                                            <i class="fas fa-angle-double-left"></i>
+                                            <span class="d-none d-sm-inline ms-1">Primera</span>
+                                        </span>
+                                    </li>
+                                    <li class="page-item disabled">
+                                        <span class="page-link px-3 py-2 text-muted">
+                                            <i class="fas fa-angle-left"></i>
+                                            <span class="d-none d-sm-inline ms-1">Anterior</span>
+                                        </span>
+                                    </li>
+                                {% endif %}
 
-                            <li class="page-item active">
-                                <span class="page-link">
-                                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
-                                </span>
-                            </li>
+                                <!-- Páginas numéricas cercanas -->
+                                {% for num in page_obj.paginator.page_range %}
+                                    {% if page_obj.number == num %}
+                                        <li class="page-item active">
+                                            <span class="page-link px-3 py-2 bg-primary border-primary">
+                                                <strong>{{ num }}</strong>
+                                            </span>
+                                        </li>
+                                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                        <li class="page-item">
+                                            <a class="page-link px-3 py-2" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                                {{ num }}
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
 
-                            {% if page_obj.has_next %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if activo %}&activo={{ activo }}{% endif %}{% if precio_min %}&precio_min={{ precio_min }}{% endif %}{% if precio_max %}&precio_max={{ precio_max }}{% endif %}{% if orden %}&orden={{ orden }}{% endif %}">
-                                        <i class="fas fa-angle-right"></i>
-                                    </a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search %}&search={{ search }}{% endif %}{% if activo %}&activo={{ activo }}{% endif %}{% if precio_min %}&precio_min={{ precio_min }}{% endif %}{% if precio_max %}&precio_max={{ precio_max }}{% endif %}{% if orden %}&orden={{ orden }}{% endif %}">
-                                        <i class="fas fa-angle-double-right"></i>
-                                    </a>
-                                </li>
-                            {% endif %}
-                        </ul>
-                    </nav>
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link px-3 py-2" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                           title="Página siguiente">
+                                            <span class="d-none d-sm-inline me-1">Siguiente</span>
+                                            <i class="fas fa-angle-right"></i>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link px-3 py-2" href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                           title="Última página">
+                                            <span class="d-none d-sm-inline me-1">Última</span>
+                                            <i class="fas fa-angle-double-right"></i>
+                                        </a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link px-3 py-2 text-muted">
+                                            <span class="d-none d-sm-inline me-1">Siguiente</span>
+                                            <i class="fas fa-angle-right"></i>
+                                        </span>
+                                    </li>
+                                    <li class="page-item disabled">
+                                        <span class="page-link px-3 py-2 text-muted">
+                                            <span class="d-none d-sm-inline me-1">Última</span>
+                                            <i class="fas fa-angle-double-right"></i>
+                                        </span>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                        
+                        <div class="text-muted">
+                            <small>
+                                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                            </small>
+                        </div>
+                    </div>
                     {% endif %}
                 </div>
             </div>
@@ -239,7 +299,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         // Para selects, enviar inmediatamente
-        if (input.type === 'select-one') {
+        if (input.tagName === 'SELECT') {
             input.addEventListener('change', function() {
                 clearTimeout(timeout);
                 form.submit();
@@ -283,6 +343,68 @@ document.addEventListener('DOMContentLoaded', function() {
     vertical-align: middle;
 }
 
+/* Estilos mejorados para paginación */
+.pagination-lg .page-link {
+    font-size: 1rem;
+    font-weight: 500;
+    border: 2px solid #dee2e6;
+    color: #495057;
+    transition: all 0.3s ease;
+    margin: 0 2px;
+    border-radius: 8px !important;
+}
+
+.pagination-lg .page-link:hover {
+    background-color: #e9ecef;
+    border-color: #adb5bd;
+    color: #212529;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.pagination-lg .page-item.active .page-link {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: white;
+    box-shadow: 0 2px 8px rgba(0,123,255,0.3);
+}
+
+.pagination-lg .page-item.disabled .page-link {
+    color: #6c757d;
+    background-color: #fff;
+    border-color: #dee2e6;
+    opacity: 0.5;
+}
+
+/* Información de paginación */
+.text-muted small {
+    font-size: 0.875rem;
+    color: #6c757d !important;
+}
+
+/* Responsive para paginación */
+@media (max-width: 768px) {
+    .d-flex.justify-content-between {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .pagination-lg {
+        justify-content: center;
+        margin: 1rem 0;
+    }
+    
+    .pagination-lg .page-link {
+        font-size: 0.875rem;
+        padding: 0.5rem 0.75rem;
+        margin: 0 1px;
+    }
+    
+    .d-none.d-sm-inline {
+        display: none !important;
+    }
+}
+
 /* Responsive para botones en móviles */
 @media (max-width: 768px) {
     .d-flex.flex-wrap {
@@ -294,6 +416,27 @@ document.addEventListener('DOMContentLoaded', function() {
         margin-bottom: 3px;
         min-width: auto;
     }
+}
+
+/* Animación para hover en botones de paginación */
+.page-link {
+    position: relative;
+    overflow: hidden;
+}
+
+.page-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+}
+
+.page-link:hover::before {
+    left: 100%;
 }
 </style>
 

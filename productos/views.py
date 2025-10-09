@@ -13,14 +13,6 @@ def lista_productos(request):
     """Vista para mostrar la lista de productos con filtros y búsqueda"""
     productos = Producto.objects.all()
     
-    # Filtro de búsqueda
-    search = request.GET.get('search')
-    if search:
-        productos = productos.filter(
-            Q(nombre__icontains=search) | 
-            Q(descripcion__icontains=search)
-        )
-    
     # Filtro por estado activo
     activo = request.GET.get('activo')
     if activo == 'true':
@@ -28,12 +20,20 @@ def lista_productos(request):
     elif activo == 'false':
         productos = productos.filter(activo=False)
     
+    # Filtro de búsqueda
+    search = request.GET.get('search')
+    if search and search not in ['None', 'null', '']:
+        productos = productos.filter(
+            Q(nombre__icontains=search) | 
+            Q(descripcion__icontains=search)
+        )
+    
     # Filtro por rango de precio
     precio_min = request.GET.get('precio_min')
     precio_max = request.GET.get('precio_max')
-    if precio_min:
+    if precio_min and precio_min.strip():
         productos = productos.filter(precio_referencia__gte=precio_min)
-    if precio_max:
+    if precio_max and precio_max.strip():
         productos = productos.filter(precio_referencia__lte=precio_max)
     
     # Ordenamiento
