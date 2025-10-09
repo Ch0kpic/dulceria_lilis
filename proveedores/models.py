@@ -6,6 +6,7 @@ class Proveedor(models.Model):
     contacto = models.CharField(max_length=200)
     direccion = models.CharField(max_length=200)
     id_usuario_registro = models.ForeignKey('usuarios.Usuario', on_delete=models.PROTECT)
+    fecha_registro = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
     def __str__(self):
         return self.nombre

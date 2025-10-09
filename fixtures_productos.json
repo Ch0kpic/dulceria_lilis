@@ -1,0 +1,102 @@
+[
+  {
+    "model": "productos.producto",
+    "pk": 1,
+    "fields": {
+      "nombre": "Alfajor de Dulce de Leche",
+      "descripcion": "Delicioso alfajor relleno con dulce de leche casero y cubierto de coco",
+      "precio_referencia": "2500.00",
+      "activo": true
+    }
+  },
+  {
+    "model": "productos.producto",
+    "pk": 2,
+    "fields": {
+      "nombre": "Chocolate con Almendras",
+      "descripcion": "Chocolate premium con almendras tostadas, ideal para regalo",
+      "precio_referencia": "4500.00",
+      "activo": true
+    }
+  },
+  {
+    "model": "productos.producto",
+    "pk": 3,
+    "fields": {
+      "nombre": "Caramelos de Miel",
+      "descripcion": "Caramelos artesanales elaborados con miel pura de abeja",
+      "precio_referencia": "1200.00",
+      "activo": true
+    }
+  },
+  {
+    "model": "productos.producto",
+    "pk": 4,
+    "fields": {
+      "nombre": "Bombones Surtidos",
+      "descripcion": "Caja de bombones variados con diferentes rellenos y sabores",
+      "precio_referencia": "8900.00",
+      "activo": true
+    }
+  },
+  {
+    "model": "productos.producto",
+    "pk": 5,
+    "fields": {
+      "nombre": "Turrones de Maní",
+      "descripcion": "Turrones crujientes con maní tostado y miel",
+      "precio_referencia": "3200.00",
+      "activo": true
+    }
+  },
+  {
+    "model": "productos.producto",
+    "pk": 6,
+    "fields": {
+      "nombre": "Gomitas de Frutas",
+      "descripcion": "Gomitas suaves con sabores naturales de frutas",
+      "precio_referencia": "800.00",
+      "activo": true
+    }
+  },
+  {
+    "model": "productos.producto",
+    "pk": 7,
+    "fields": {
+      "nombre": "Paletas de Chocolate",
+      "descripcion": "Paletas de chocolate negro decoradas con sprinkles coloridos",
+      "precio_referencia": "1800.00",
+      "activo": true
+    }
+  },
+  {
+    "model": "productos.producto",
+    "pk": 8,
+    "fields": {
+      "nombre": "Marshmallows Gigantes",
+      "descripcion": "Marshmallows extra grandes perfectos para asar o comer solos",
+      "precio_referencia": "1500.00",
+      "activo": true
+    }
+  },
+  {
+    "model": "productos.producto",
+    "pk": 9,
+    "fields": {
+      "nombre": "Dulce de Leche Artesanal",
+      "descripcion": "Dulce de leche casero en frasco de vidrio de 500g",
+      "precio_referencia": "5500.00",
+      "activo": true
+    }
+  },
+  {
+    "model": "productos.producto",
+    "pk": 10,
+    "fields": {
+      "nombre": "Chupetes de Caramelo",
+      "descripcion": "Chupetes de caramelo duro con diferentes sabores frutales",
+      "precio_referencia": "600.00",
+      "activo": true
+    }
+  }
+]
