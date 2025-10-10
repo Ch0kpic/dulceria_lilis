@@ -17,9 +17,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.shortcuts import redirect
+from .admin_custom import role_based_admin_site
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    # Admin personalizado basado en roles
+    path('admin/', role_based_admin_site.urls),
+    
+    # URLs de la aplicación
     path('', lambda request: redirect('login')),
     path('', include('authentication.urls')),
     path('productos/', include('productos.urls')),
