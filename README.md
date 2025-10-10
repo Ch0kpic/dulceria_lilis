@@ -40,15 +40,42 @@ Sistema web desarrollado en Django para la gestión integral de una dulcería, i
    pip install -r requirements.txt
    ```
 
-3. **Configurar MySQL con WAMP (RECOMENDADO)**:
-   ```batch
-   resetear_mysql.bat
+3. **Configurar Variables de Entorno**:
+   
+   Archivo `.env` ya configurado en `dulceria/.env`:
+   ```env
+   # Configuración Django
+   DJANGO_SECRET_KEY=django-insecure-laboratorio-dulceria-lilis-2025-supersecret
+   DJANGO_DEBUG=True
+
+   # Para MySQL (Producción/Laboratorio)
+   DB_ENGINE=mysql
+   DB_NAME=dulceria_lilis
+   DB_USER=dulceria_user
+   DB_PASSWORD=dulceria_password123
+   DB_HOST=localhost
+   DB_PORT=3306
+
+   # Para SQLite (más simple para pruebas)
+   # DB_ENGINE=sqlite
+   # DB_NAME=db.sqlite3
    ```
 
-   **Alternativas disponibles:**
-   - `setup_django_mysql.bat` - Configuración directa
-   - `instalacion_rapida.bat` - Script original
-   - `limpiar_importar_bd.bat` - Importar SQL
+4. **Configurar Base de Datos MySQL**:
+   
+   **Opción A - WAMP (Recomendado para laboratorio):**
+   - Abrir phpMyAdmin: http://localhost/phpmyadmin
+   - Crear base de datos: `dulceria_lilis`
+   - Usar usuario `root` sin contraseña (por defecto en WAMP)
+
+   **Opción B - MySQL Personalizado:**
+   ```sql
+   -- Ejecutar configurar_mysql.sql o manualmente:
+   CREATE DATABASE dulceria_lilis CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+   CREATE USER 'dulceria_user'@'localhost' IDENTIFIED BY 'dulceria_password123';
+   GRANT ALL PRIVILEGES ON dulceria_lilis.* TO 'dulceria_user'@'localhost';
+   FLUSH PRIVILEGES;
+   ```
 
 4. **Iniciar el servidor**:
    ```bash
