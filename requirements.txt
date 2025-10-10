@@ -1,5 +1,19 @@
+# Framework Django
 Django==5.2.7
+
+# Base de datos MySQL
+PyMySQL>=1.1.0
+mysqlclient>=2.2.0
+
+# Configuración de entorno
 python-dotenv>=1.0.0
+
+# Dependencias core de Django
 asgiref>=3.8.0
 sqlparse>=0.5.0
-mysqlclient>=2.1.0
+tzdata>=2024.1
+
+# Desarrollo y utilidades
+setuptools>=69.0.0
+wheel>=0.42.0
+pip>=24.0.0

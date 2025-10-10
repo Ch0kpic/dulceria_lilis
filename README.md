@@ -1,8 +1,8 @@
-# Sistema de Gestión - Dulcería Lilis
+# Sistema de Gestión - Dulcería Lilis 🍭
 
-Sistema web desarrollado en Django para la gestión integral de una dulcería, incluyendo manejo de inventario, ventas, compras y usuarios con roles específicos.
+Sistema web desarrollado en Django para la gestión integral de una dulcería con inventario, ventas, compras y usuarios con roles específicos.
 
-## Características Principales
+## ✨ Características
 
 - **Gestión de Usuarios**: Sistema de roles (Administrador, Vendedor, Comprador)
 - **Inventario**: Control completo de productos y stock
@@ -11,208 +11,140 @@ Sistema web desarrollado en Django para la gestión integral de una dulcería, i
 - **Proveedores**: Gestión de información de proveedores
 - **Reportes**: Dashboard con métricas del negocio
 
-## Tecnologías Utilizadas
+## 🛠️ Tecnologías
 
 - **Backend**: Django 5.2.7
-- **Base de Datos**: MySQL (compatible con WAMP)
+- **Base de Datos**: MySQL 8.3.0 (PyMySQL)
 - **Frontend**: Bootstrap 5 + JavaScript
-- **Autenticación**: Sistema personalizado de Django
+- **Servidor**: WAMP Server
 
-## Instalación Rápida para Laboratorio
+## 🚀 Instalación
 
 ### Prerrequisitos
-- WAMP Server instalado y funcionando (ícono verde)
-- Python 3.11+ instalado
-- Git instalado
+- ✅ WAMP Server ejecutándose (ícono verde)
+- ✅ Python 3.11+
 
-### Pasos de Instalación
+### Instalación Automática
+```bash
+INSTALAR.bat
+```
 
-1. **Clonar el repositorio**:
-   ```bash
-   git clone https://github.com/Ch0kpic/dulceria_lilis.git
-   cd dulceria_lilis
-   ```
+### Instalación Manual
+```bash
+# 1. Crear entorno virtual
+python -m venv env
+env\Scripts\activate
+pip install -r requirements.txt
 
-2. **Crear entorno virtual e instalar dependencias**:
-   ```bash
-   python -m venv env
-   env\Scripts\activate
-   pip install -r requirements.txt
-   ```
+# 2. Configurar MySQL
+cd dulceria
+python -c "
+import mysql.connector
+conn = mysql.connector.connect(host='localhost', user='root', password='')
+cursor = conn.cursor()
+cursor.execute('CREATE DATABASE IF NOT EXISTS dulceria_lilis CHARACTER SET utf8mb4')
+cursor.execute('CREATE USER IF NOT EXISTS \"dulceria_user\"@\"localhost\" IDENTIFIED BY \"dulceria_password123\"')
+cursor.execute('GRANT ALL PRIVILEGES ON dulceria_lilis.* TO \"dulceria_user\"@\"localhost\"')
+cursor.execute('FLUSH PRIVILEGES')
+print('MySQL configurado')
+"
 
-3. **Configurar Variables de Entorno**:
-   
-   Archivo `.env` ya configurado en `dulceria/.env`:
-   ```env
-   # Configuración Django
-   DJANGO_SECRET_KEY=django-insecure-laboratorio-dulceria-lilis-2025-supersecret
-   DJANGO_DEBUG=True
+# 3. Migrar datos
+python manage.py migrate
+python manage.py loaddata fixtures_roles.json
+python manage.py loaddata fixtures_usuarios.json
+python manage.py loaddata fixtures_proveedores.json
+python manage.py loaddata fixtures_productos.json
+python manage.py loaddata fixtures_productos_premium.json
 
-   # Para MySQL (Producción/Laboratorio)
-   DB_ENGINE=mysql
-   DB_NAME=dulceria_lilis
-   DB_USER=dulceria_user
-   DB_PASSWORD=dulceria_password123
-   DB_HOST=localhost
-   DB_PORT=3306
+# 4. Iniciar servidor
+python manage.py runserver
+```
 
-   # Para SQLite (más simple para pruebas)
-   # DB_ENGINE=sqlite
-   # DB_NAME=db.sqlite3
-   ```
+## 🔑 Acceso
 
-4. **Configurar Base de Datos MySQL**:
-   
-   **Opción A - WAMP (Recomendado para laboratorio):**
-   - Abrir phpMyAdmin: http://localhost/phpmyadmin
-   - Crear base de datos: `dulceria_lilis`
-   - Usar usuario `root` sin contraseña (por defecto en WAMP)
+- **Web**: http://127.0.0.1:8000
+- **Admin**: http://127.0.0.1:8000/admin
+- **phpMyAdmin**: http://localhost/phpmyadmin
 
-   **Opción B - MySQL Personalizado:**
-   ```sql
-   -- Ejecutar configurar_mysql.sql o manualmente:
-   CREATE DATABASE dulceria_lilis CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-   CREATE USER 'dulceria_user'@'localhost' IDENTIFIED BY 'dulceria_password123';
-   GRANT ALL PRIVILEGES ON dulceria_lilis.* TO 'dulceria_user'@'localhost';
-   FLUSH PRIVILEGES;
-   ```
+### Usuarios de Prueba
+- **admin** / **admin123** (Administrador)
+- **vendedor** / **vendedor123** (Vendedor)
+- **comprador** / **comprador123** (Comprador)
 
-4. **Iniciar el servidor**:
-   ```bash
-   cd dulceria
-   python manage.py runserver
-   ```
+## 📊 Datos Incluidos
 
-5. **Acceder al sistema**:
-   - **Django**: http://127.0.0.1:8000
-   - **phpMyAdmin**: http://localhost/phpmyadmin (BD: dulceria_lilis)
-   - **Admin**: usuario `admin` / contraseña `admin123`
+- **3 Usuarios** con roles específicos
+- **30 Productos** (chocolates, dulces, regalos)
+- **6 Proveedores** con información completa
+- **5 Roles** con permisos configurados
 
-### 🎯 **Para Presentación en Laboratorio**
-El sistema está configurado para **MySQL + WAMP** automáticamente.
-Ejecutar `resetear_mysql.bat` garantiza configuración limpia y funcional.
-
-## Datos de Prueba Incluidos
-
-### Usuarios Predefinidos
-- **Administrador**: admin / admin123
-- **Vendedor**: vendedor / vendedor123  
-- **Comprador**: comprador / comprador123
-
-### Catálogo de Productos
-- 30 productos premium incluyendo:
-  - Chocolates artesanales
-  - Dulces importados
-  - Regalos corporativos
-  - Productos para eventos
-
-### Proveedores
-- 6 proveedores configurados con información completa
-- Diferentes especialidades y términos de pago
-
-## Estructura del Proyecto
+## 📁 Estructura
 
 ```
 dulceria_lilis/
-├── dulceria/                 # Proyecto Django principal
+├── dulceria/              # Django principal
 │   ├── manage.py
-│   ├── dulceria/            # Configuración del proyecto
-│   ├── authentication/      # Autenticación personalizada
-│   ├── usuarios/            # Gestión de usuarios
-│   ├── roles/              # Sistema de roles
-│   ├── productos/          # Catálogo de productos
-│   ├── inventario/         # Control de stock
-│   ├── proveedores/        # Gestión de proveedores
-│   ├── solicitudes_compra/ # Sistema de compras
-│   ├── ventas/             # Registro de ventas
-│   ├── clientes/           # Información de clientes
-│   └── templates/          # Plantillas HTML
-├── env/                    # Entorno virtual Python
-├── requirements.txt        # Dependencias del proyecto
-├── .env.example           # Configuración de ejemplo
-└── instalacion_rapida.bat # Script de instalación automática
+│   ├── .env              # Configuración
+│   ├── dulceria/         # Settings
+│   ├── usuarios/         # Gestión usuarios
+│   ├── productos/        # Catálogo
+│   ├── inventario/       # Stock
+│   ├── proveedores/      # Proveedores
+│   ├── ventas/          # Ventas
+│   └── templates/       # HTML
+├── requirements.txt     # Dependencias
+├── INSTALAR.bat        # Script instalación
+└── VERIFICAR_SISTEMA.bat # Verificación
 ```
 
-## Funcionalidades por Rol
+## 🔐 Funcionalidades por Rol
 
-### Administrador
-- Acceso completo al sistema
-- Gestión de usuarios y roles
-- Configuración del sistema
-- Reportes y estadísticas
+**Administrador**: Acceso completo, gestión usuarios, reportes
+**Vendedor**: Ventas, inventario, clientes
+**Comprador**: Solicitudes compra, proveedores, stock
 
-### Vendedor
-- Registro de ventas
-- Consulta de inventario
-- Gestión de clientes
-- Reportes de ventas
+## ⚙️ Configuración MySQL
 
-### Comprador
-- Creación de solicitudes de compra
-- Gestión de proveedores
-- Seguimiento de pedidos
-- Control de stock mínimo
-
-## Base de Datos
-
-El sistema utiliza MySQL y es compatible con WAMP Server. La configuración se realiza automáticamente durante la instalación.
-
-### Configuración Manual (si es necesario)
-```python
-# En dulceria/settings.py
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'dulceria_lilis',
-        'USER': 'root',
-        'PASSWORD': '',  # Contraseña de MySQL
-        'HOST': 'localhost',
-        'PORT': '3306',
-    }
-}
+### Variables de entorno (.env)
+```env
+DATABASE_ENGINE=django.db.backends.mysql
+DATABASE_NAME=dulceria_lilis
+DATABASE_USER=dulceria_user
+DATABASE_PASSWORD=dulceria_password123
+DATABASE_HOST=localhost
+DATABASE_PORT=3306
 ```
 
-## Comandos Útiles
-
-### Cargar datos de prueba adicionales
+### Comandos útiles
 ```bash
-python manage.py cargar_productos_premium
+# Verificar sistema
+VERIFICAR_SISTEMA.bat
+
+# Ver datos
+python manage.py shell -c "
+from usuarios.models import Usuario
+from productos.models import Producto
+print(f'Usuarios: {Usuario.objects.count()}')
+print(f'Productos: {Producto.objects.count()}')
+"
+
+# Backup MySQL
+mysqldump -u dulceria_user -p dulceria_lilis > backup.sql
 ```
 
-### Inicializar sistema completo
-```bash
-python manage.py inicializar_dulceria
-```
+## 🔧 Solución de Problemas
 
-### Crear superusuario adicional
-```bash
-python manage.py createsuperuser
-```
+**Error MySQL**: Verificar WAMP activo, ejecutar `configurar_mysql.sql`
+**Error dependencias**: `pip install -r requirements.txt`
+**Error migraciones**: `python manage.py migrate --fake-initial`
 
-## Solución de Problemas Comunes
+## 📞 Contacto
 
-### Error de conexión MySQL
-1. Verificar que WAMP esté ejecutándose
-2. Comprobar credenciales en `.env`
-3. Asegurar que la base de datos `dulceria_lilis` exista
+- **Desarrollador**: Dylan
+- **Repositorio**: https://github.com/Ch0kpic/dulceria_lilis
+- **Estado**: ✅ Migrado a MySQL completamente
 
-### Error de migraciones
-```bash
-python manage.py makemigrations
-python manage.py migrate
-```
+---
 
-### Error de dependencias
-```bash
-pip install -r requirements.txt
-```
-
-## Contacto
-
-Proyecto desarrollado para Dulcería Lilis
-- Desarrollador: Dylan
-- Repositorio: https://github.com/Ch0kpic/dulceria_lilis
-
-## Licencia
-
-Proyecto educativo - Todos los derechos reservados
+**Sistema listo para producción con MySQL** 🚀

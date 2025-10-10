@@ -1,32 +1,42 @@
-# Base de Datos - Dulcería Lilis
+# Base de Datos MySQL - Dulcería Lilis 🗄️
 
-## 📋 Información de la base de datos exportada
+## 📋 Información Actualizada - Migración a MySQL
 
-### 🎯 **Para presentación en laboratorio**
+### 🎯 **Configuración Actual del Sistema**
 
-Esta base de datos contiene todos los datos de prueba necesarios para la demostración del sistema:
+**✅ Estado**: Migrado completamente a **MySQL 8.3.0** con **PyMySQL**  
+**✅ Servidor**: WAMP Server (localhost:3306)  
+**✅ Base de datos**: `dulceria_lilis`  
+**✅ Usuario**: `dulceria_user` / `dulceria_password123`  
 
-### 📊 **Contenido incluido:**
-- ✅ **Roles de usuario** (Administrador, Vendedor, Comprador)
-- ✅ **Usuarios de prueba** con contraseñas configuradas
-- ✅ **Productos del catálogo** (30+ productos premium)
-- ✅ **Proveedores** (6 proveedores con información completa)
-- ✅ **Solicitudes de compra** (ejemplos para demostración)
+### 📊 **Datos Migrados y Verificados:**
+- ✅ **5 Roles** del sistema (Administrador, Vendedor, Comprador, etc.)
+- ✅ **3 Usuarios** de prueba con contraseñas configuradas
+- ✅ **30 Productos** del catálogo (regulares + premium)
+- ✅ **6 Proveedores** con información completa
+- ✅ **Estructura completa** de tablas Django
 
-### 👥 **Usuarios disponibles:**
-| Usuario | Contraseña | Rol | Permisos |
-|---------|------------|-----|----------|
-| `admin` | `admin123` | Administrador | Acceso completo |
-| `vendedor` | `vendedor123` | Vendedor | Ventas y clientes |
-| `comprador` | `comprador123` | Comprador | Solicitudes de compra |
+### 👥 **Usuarios Disponibles (Migrados a MySQL):**
+| Usuario | Contraseña | Rol | Estado | Permisos |
+|---------|------------|-----|---------|----------|
+| `admin` | `admin123` | Administrador | ✅ Activo | Acceso completo al sistema |
+| `vendedor` | `vendedor123` | Vendedor | ✅ Activo | Ventas, inventario, clientes |
+| `comprador` | `comprador123` | Comprador | ✅ Activo | Solicitudes de compra, proveedores |
 
-### 🗄️ **Estructura de tablas principales:**
-- `usuarios_usuario` - Información de usuarios del sistema
-- `productos_producto` - Catálogo de productos
-- `proveedores_proveedor` - Base de datos de proveedores
-- `solicitudes_compra_solicitudcompra` - Gestión de compras
-- `inventario_inventario` - Control de stock
-- `ventas_venta` - Registro de transacciones
+### 🗄️ **Estructura MySQL Actual:**
+```sql
+-- Tablas principales migradas:
+auth_user                     -- Usuarios Django (3 registros)
+usuarios_usuario              -- Usuarios personalizados (3 registros)  
+roles_rol                     -- Roles del sistema (5 registros)
+productos_producto            -- Catálogo productos (30 registros)
+productos_categoria           -- Categorías de productos
+proveedores_proveedor         -- Proveedores (6 registros)
+inventario_inventario         -- Control de stock
+solicitudes_compra_*          -- Sistema de compras
+ventas_venta                  -- Registro de ventas
+clientes_cliente              -- Base de clientes
+```
 
 ## 🚀 **Instrucciones de uso en laboratorio:**
 
