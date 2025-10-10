@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalle del Producto{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="card-title">
+                        <i class="fas fa-box"></i> Detalle del Producto
+                    </h3>
+                    <div>
+                        {% if producto.activo %}
+                            <span class="badge bg-success">Activo</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Inactivo</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>ID:</strong> {{ producto.id_producto }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Nombre:</strong> {{ producto.nombre }}
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <strong>Descripción:</strong>
+                            <p>{{ producto.descripcion }}</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>Precio de Referencia:</strong>
+                            <span class="badge bg-success fs-6">${{ producto.precio_referencia|floatformat:2 }}</span>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Stock Total:</strong>
+                            {% with stock=producto.get_stock_total %}
+                                {% if stock > 0 %}
+                                    <span class="badge bg-primary fs-6">{{ stock }} unidades</span>
+                                {% else %}
+                                    <span class="badge bg-warning fs-6">Sin stock</span>
+                                {% endif %}
+                            {% endwith %}
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>Fecha de Creación:</strong>
+                            {{ producto.fecha_creacion|date:"d/m/Y H:i" }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Última Actualización:</strong>
+                            {{ producto.fecha_actualizacion|date:"d/m/Y H:i" }}
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'productos:lista' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Volver a la lista
+                        </a>
+                        <div>
+                            <a href="{% url 'inventario:por_producto' producto.pk %}" class="btn btn-info me-2">
+                                <i class="fas fa-warehouse"></i> Ver Inventario
+                            </a>
+                            <a href="{% url 'productos:editar' producto.pk %}" class="btn btn-warning me-2">
+                                <i class="fas fa-edit"></i> Editar
+                            </a>
+                            <a href="{% url 'productos:eliminar' producto.pk %}" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Eliminar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-warehouse"></i> Inventarios</h5>
+                </div>
+                <div class="card-body">
+                    {% if inventarios %}
+                        {% for inventario in inventarios %}
+                        <div class="border rounded p-2 mb-2">
+                            <div class="d-flex justify-content-between">
+                                <strong>{{ inventario.ubicacion }}</strong>
+                                {% if inventario.cantidad_actual <= inventario.stock_minimo %}
+                                    <span class="badge bg-danger">{{ inventario.cantidad_actual }}</span>
+                                {% elif inventario.cantidad_actual >= inventario.stock_maximo %}
+                                    <span class="badge bg-info">{{ inventario.cantidad_actual }}</span>
+                                {% else %}
+                                    <span class="badge bg-success">{{ inventario.cantidad_actual }}</span>
+                                {% endif %}
+                            </div>
+                            <small class="text-muted">
+                                Min: {{ inventario.stock_minimo }} | Max: {{ inventario.stock_maximo }}
+                            </small>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted text-center">
+                            <i class="fas fa-exclamation-triangle"></i><br>
+                            No hay registros de inventario para este producto.
+                        </p>
+                        <a href="{% url 'inventario:crear' %}?producto={{ producto.pk }}" class="btn btn-primary btn-sm w-100">
+                            <i class="fas fa-plus"></i> Crear Inventario
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

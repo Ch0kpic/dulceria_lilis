@@ -1,0 +1,259 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard Comprador - Dulcería Lilis{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="bi bi-cart text-primary"></i> Dashboard - Comprador
+                <small class="text-muted">Bienvenido, {{ user.nombre|default:user.username }}</small>
+            </h1>
+        </div>
+    </div>
+
+    <!-- Cards específicos para Comprador -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card bg-primary text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Proveedores</h5>
+                            <h2 class="mb-0">23</h2>
+                            <p class="mb-0">Proveedores activos</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-truck" style="font-size: 2rem;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card bg-warning text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Pendientes</h5>
+                            <h2 class="mb-0">8</h2>
+                            <p class="mb-0">Órdenes pendientes</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-clock-history" style="font-size: 2rem;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card bg-success text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Este Mes</h5>
+                            <h2 class="mb-0">$45,230</h2>
+                            <p class="mb-0">Total en compras</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-currency-dollar" style="font-size: 2rem;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card bg-info text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Evaluaciones</h5>
+                            <h2 class="mb-0">92%</h2>
+                            <p class="mb-0">Promedio cumplimiento</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-star-fill" style="font-size: 2rem;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Acciones específicas del Comprador -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h3 class="mb-3">Gestión de Compras</h3>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-file-earmark-plus"></i> Solicitudes de Compra</h5>
+                </div>
+                <div class="card-body">
+                    <p>Crea y gestiona solicitudes de compra para iniciar el proceso de abastecimiento.</p>
+                    <div class="row">
+                        <div class="col-6">
+                            <a href="#" class="btn btn-primary btn-sm w-100 mb-2">
+                                <i class="bi bi-plus-circle"></i> Nueva Solicitud
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="#" class="btn btn-outline-primary btn-sm w-100 mb-2">
+                                <i class="bi bi-list-check"></i> Ver Solicitudes
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-cart-check"></i> Órdenes de Compra</h5>
+                </div>
+                <div class="card-body">
+                    <p>Gestiona órdenes de compra y controla el proceso de adquisiciones.</p>
+                    <div class="row">
+                        <div class="col-6">
+                            <a href="#" class="btn btn-success btn-sm w-100 mb-2">
+                                <i class="bi bi-plus-circle"></i> Nueva Orden
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="#" class="btn btn-outline-success btn-sm w-100 mb-2">
+                                <i class="bi bi-eye"></i> Seguimiento
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gestión de Proveedores -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-truck"></i> Gestión de Proveedores</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <a href="#" class="btn btn-outline-info w-100 mb-2">
+                                <i class="bi bi-person-plus"></i> Agregar Proveedor
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="#" class="btn btn-outline-info w-100 mb-2">
+                                <i class="bi bi-star"></i> Evaluar Proveedores
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="#" class="btn btn-outline-info w-100 mb-2">
+                                <i class="bi bi-graph-up"></i> Rendimiento
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="#" class="btn btn-outline-info w-100 mb-2">
+                                <i class="bi bi-file-earmark-text"></i> Contratos
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de órdenes recientes -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-list-ul"></i> Órdenes Recientes</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Orden #</th>
+                                    <th>Proveedor</th>
+                                    <th>Fecha</th>
+                                    <th>Monto</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>OC-2025-001</td>
+                                    <td>Proveedores ABC S.A.</td>
+                                    <td>08/10/2025</td>
+                                    <td>$12,450</td>
+                                    <td><span class="badge bg-warning">Pendiente</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary">Ver</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>OC-2025-002</td>
+                                    <td>Dulces y Más Ltda.</td>
+                                    <td>07/10/2025</td>
+                                    <td>$8,750</td>
+                                    <td><span class="badge bg-success">Entregado</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary">Ver</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>OC-2025-003</td>
+                                    <td>Materias Primas XYZ</td>
+                                    <td>06/10/2025</td>
+                                    <td>$15,230</td>
+                                    <td><span class="badge bg-info">En Tránsito</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary">Ver</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alertas específicas -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-bell text-warning"></i> Alertas de Compras</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning" role="alert">
+                        <i class="bi bi-exclamation-triangle"></i> 
+                        <strong>Retraso:</strong> OC-2025-001 con fecha de entrega vencida (2 días de retraso)
+                    </div>
+                    <div class="alert alert-info" role="alert">
+                        <i class="bi bi-info-circle"></i> 
+                        <strong>Solicitud Pendiente:</strong> SC-2025-015 requiere aprobación para procesar
+                    </div>
+                    <div class="alert alert-success" role="alert">
+                        <i class="bi bi-check-circle"></i> 
+                        <strong>Evaluación:</strong> Proveedor "Dulces ABC" calificado con 95% de cumplimiento
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

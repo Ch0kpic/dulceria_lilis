@@ -1,0 +1,301 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Nueva Solicitud de Compra{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-plus-circle me-2"></i>
+                        Nueva Solicitud de Compra
+                    </h3>
+                </div>
+                
+                <div class="card-body">
+                    <form method="post" id="solicitudForm">
+                        {% csrf_token %}
+                        
+                        <!-- Información básica -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="{{ form.proveedor.id_for_label }}" class="form-label">
+                                    <i class="fas fa-truck me-1"></i>
+                                    Proveedor *
+                                </label>
+                                {{ form.proveedor }}
+                                {% if form.proveedor.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {{ form.proveedor.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <label for="{{ form.prioridad.id_for_label }}" class="form-label">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    Prioridad
+                                </label>
+                                {{ form.prioridad }}
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <label for="{{ form.fecha_necesaria.id_for_label }}" class="form-label">
+                                    <i class="fas fa-calendar me-1"></i>
+                                    Fecha Necesaria *
+                                </label>
+                                {{ form.fecha_necesaria }}
+                                {% if form.fecha_necesaria.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {{ form.fecha_necesaria.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <label for="{{ form.observaciones.id_for_label }}" class="form-label">
+                                    <i class="fas fa-comment me-1"></i>
+                                    Observaciones
+                                </label>
+                                {{ form.observaciones }}
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Detalles de productos -->
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5>
+                                <i class="fas fa-list me-2"></i>
+                                Productos Solicitados
+                            </h5>
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="addFormsetRow()">
+                                <i class="fas fa-plus me-1"></i>
+                                Agregar Producto
+                            </button>
+                        </div>
+
+                        <div id="formset-container">
+                            {{ formset.management_form }}
+                            {% for form in formset %}
+                                <div class="formset-row border rounded p-3 mb-3" data-form-index="{{ forloop.counter0 }}">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <label for="{{ form.producto.id_for_label }}" class="form-label">
+                                                Producto *
+                                            </label>
+                                            {{ form.producto }}
+                                            {% if form.producto.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {{ form.producto.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <div class="col-md-2">
+                                            <label for="{{ form.cantidad_solicitada.id_for_label }}" class="form-label">
+                                                Cantidad *
+                                            </label>
+                                            {{ form.cantidad_solicitada }}
+                                            {% if form.cantidad_solicitada.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {{ form.cantidad_solicitada.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <div class="col-md-2">
+                                            <label for="{{ form.precio_estimado.id_for_label }}" class="form-label">
+                                                Precio Estimado *
+                                            </label>
+                                            {{ form.precio_estimado }}
+                                            {% if form.precio_estimado.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {{ form.precio_estimado.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <div class="col-md-3">
+                                            <label for="{{ form.observaciones.id_for_label }}" class="form-label">
+                                                Observaciones
+                                            </label>
+                                            {{ form.observaciones }}
+                                        </div>
+                                        
+                                        <div class="col-md-1 d-flex align-items-end">
+                                            {% if not forloop.first %}
+                                                <button type="button" class="btn btn-outline-danger btn-sm" 
+                                                        onclick="removeFormsetRow(this)" title="Eliminar">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    {% for hidden in form.hidden_fields %}
+                                        {{ hidden }}
+                                    {% endfor %}
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Total estimado -->
+                        <div class="row mb-3">
+                            <div class="col-12 text-end">
+                                <h5>
+                                    Total estimado: 
+                                    <span class="text-success" id="totalEstimado">$0.00</span>
+                                </h5>
+                            </div>
+                        </div>
+
+                        <!-- Botones -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a href="{% url 'solicitudes_compra:lista' %}" class="btn btn-secondary">
+                                        <i class="fas fa-arrow-left me-1"></i>
+                                        Cancelar
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-1"></i>
+                                        Crear Solicitud
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let formsetIndex = parseInt('{{ formset.total_form_count }}');
+
+// Calcular total cuando cambien los valores
+document.addEventListener('input', function(e) {
+    if (e.target.classList.contains('cantidad-input') || e.target.classList.contains('precio-input')) {
+        calcularTotal();
+    }
+});
+
+function calcularTotal() {
+    let total = 0;
+    const formsetRows = document.querySelectorAll('.formset-row');
+    
+    formsetRows.forEach(function(row) {
+        const cantidadInput = row.querySelector('.cantidad-input');
+        const precioInput = row.querySelector('.precio-input');
+        
+        if (cantidadInput && precioInput) {
+            const cantidad = parseFloat(cantidadInput.value) || 0;
+            const precio = parseFloat(precioInput.value) || 0;
+            total += cantidad * precio;
+        }
+    });
+    
+    const totalElement = document.getElementById('totalEstimado');
+    if (totalElement) {
+        totalElement.textContent = '$' + total.toFixed(2);
+    }
+}
+
+function addFormsetRow() {
+    const container = document.getElementById('formset-container');
+    const totalForms = document.querySelector('[name$=TOTAL_FORMS]');
+    
+    // Clonar la primera fila como template
+    const firstRow = container.querySelector('.formset-row');
+    const newRow = firstRow.cloneNode(true);
+    
+    // Actualizar índices en el nuevo formulario
+    const inputs = newRow.querySelectorAll('input, select, textarea');
+    inputs.forEach(input => {
+        if (input.name) {
+            input.name = input.name.replace(/form-\d+/, `form-${formsetIndex}`);
+            input.id = input.id.replace(/id_form-\d+/, `id_form-${formsetIndex}`);
+        }
+        input.value = '';
+    });
+    
+    // Agregar botón de eliminar
+    const deleteButtonCol = newRow.querySelector('.col-md-1');
+    deleteButtonCol.innerHTML = `
+        <button type="button" class="btn btn-outline-danger btn-sm" 
+                onclick="removeFormsetRow(this)" title="Eliminar">
+            <i class="fas fa-trash"></i>
+        </button>
+    `;
+    
+    // Actualizar data-form-index
+    newRow.setAttribute('data-form-index', formsetIndex);
+    
+    container.appendChild(newRow);
+    
+    // Actualizar el contador de formularios
+    totalForms.value = parseInt(totalForms.value) + 1;
+    formsetIndex++;
+    
+    calcularTotal();
+}
+
+function removeFormsetRow(button) {
+    const row = button.closest('.formset-row');
+    const totalForms = document.querySelector('[name$=TOTAL_FORMS]');
+    
+    // Marcar para eliminación si tiene un campo DELETE
+    const deleteInput = row.querySelector('[name$=DELETE]');
+    if (deleteInput) {
+        deleteInput.checked = true;
+        row.style.display = 'none';
+    } else {
+        row.remove();
+        totalForms.value = parseInt(totalForms.value) - 1;
+    }
+    
+    calcularTotal();
+}
+
+// Calcular total inicial
+document.addEventListener('DOMContentLoaded', function() {
+    calcularTotal();
+});
+
+// Validación del formulario
+document.getElementById('solicitudForm').addEventListener('submit', function(e) {
+    let hasProducts = false;
+    
+    const visibleRows = document.querySelectorAll('.formset-row:not([style*="display: none"])');
+    
+    visibleRows.forEach(function(row) {
+        const productoSelect = row.querySelector('.producto-select');
+        const cantidadInput = row.querySelector('.cantidad-input');
+        
+        if (productoSelect && cantidadInput) {
+            const producto = productoSelect.value;
+            const cantidad = parseFloat(cantidadInput.value) || 0;
+            
+            if (producto && cantidad > 0) {
+                hasProducts = true;
+            }
+        }
+    });
+    
+    if (!hasProducts) {
+        e.preventDefault();
+        alert('Debe agregar al menos un producto a la solicitud.');
+        return false;
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Registro - Dulcería Lilis{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card">
+                <div class="card-header bg-gradient text-white text-center">
+                    <h3 class="mb-0">
+                        <i class="bi bi-person-plus"></i> Registro
+                    </h3>
+                    <p class="mb-0">Crea tu cuenta en Dulcería Lilis</p>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <!-- Mostrar errores del formulario -->
+                        {% if register_form.errors %}
+                            <div class="alert alert-danger">
+                                {{ register_form.errors }}
+                            </div>
+                        {% endif %}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="id_username" class="form-label">
+                                    <i class="bi bi-person"></i> Usuario *
+                                </label>
+                                {{ register_form.username }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="id_nombre" class="form-label">
+                                    <i class="bi bi-card-text"></i> Nombre Completo *
+                                </label>
+                                {{ register_form.nombre }}
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_email" class="form-label">
+                                <i class="bi bi-envelope"></i> Correo Electrónico *
+                            </label>
+                            {{ register_form.email }}
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_id_rol" class="form-label">
+                                <i class="bi bi-person-badge"></i> Rol
+                            </label>
+                            {{ register_form.id_rol }}
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="id_password1" class="form-label">
+                                    <i class="bi bi-lock"></i> Contraseña *
+                                </label>
+                                {{ register_form.password1 }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="id_password2" class="form-label">
+                                    <i class="bi bi-lock-fill"></i> Confirmar Contraseña *
+                                </label>
+                                {{ register_form.password2 }}
+                            </div>
+                        </div>
+                        <div class="d-grid gap-2 mb-3">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-person-plus"></i> Crear Cuenta
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-center">
+                    <p class="mb-0">
+                        ¿Ya tienes cuenta? 
+                        <a href="{% url 'login' %}" class="text-decoration-none">Inicia sesión aquí</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

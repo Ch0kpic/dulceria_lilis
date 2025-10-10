@@ -1,0 +1,444 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Productos{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="card-title">
+                        <i class="fas fa-box"></i> Gestión de Productos
+                    </h3>
+                    <a href="{% url 'productos:crear' %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Nuevo Producto
+                    </a>
+                </div>
+
+                <!-- Filtros de búsqueda -->
+                <div class="card-body">
+                    <form method="get" class="mb-4">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label for="search" class="form-label">Buscar:</label>
+                                <input type="text" name="search" id="search" class="form-control" 
+                                       value="{{ search }}" placeholder="Nombre o descripción">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="activo" class="form-label">Estado:</label>
+                                <select name="activo" id="activo" class="form-control">
+                                    <option value="">🔄 Todos</option>
+                                    <option value="true" {% if activo == 'true' %}selected{% endif %}>✅ Activos</option>
+                                    <option value="false" {% if activo == 'false' %}selected{% endif %}>❌ Inactivos</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label for="precio_min" class="form-label">Precio Min:</label>
+                                <input type="number" name="precio_min" id="precio_min" class="form-control" 
+                                       value="{{ precio_min }}" step="0.01" placeholder="0.00">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="precio_max" class="form-label">Precio Max:</label>
+                                <input type="number" name="precio_max" id="precio_max" class="form-control" 
+                                       value="{{ precio_max }}" step="0.01" placeholder="0.00">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="orden" class="form-label">Ordenar por:</label>
+                                <select name="orden" id="orden" class="form-control">
+                                    <option value="nombre" {% if orden == 'nombre' %}selected{% endif %}>Nombre A-Z</option>
+                                    <option value="-nombre" {% if orden == '-nombre' %}selected{% endif %}>Nombre Z-A</option>
+                                    <option value="precio_referencia" {% if orden == 'precio_referencia' %}selected{% endif %}>Precio ↑</option>
+                                    <option value="-precio_referencia" {% if orden == '-precio_referencia' %}selected{% endif %}>Precio ↓</option>
+                                    <option value="-fecha_creacion" {% if orden == '-fecha_creacion' %}selected{% endif %}>Más Recientes</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end gap-2">
+                                <button type="submit" class="btn btn-primary flex-fill" title="Aplicar filtros">
+                                    <i class="fas fa-filter me-1"></i>Aplicar
+                                </button>
+                                <a href="{% url 'productos:lista' %}" class="btn btn-outline-secondary flex-fill" title="Limpiar filtros">
+                                    <i class="fas fa-eraser me-1"></i>Limpiar
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Tabla de productos -->
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th style="width: 60px;">ID</th>
+                                    <th style="width: 200px;">Nombre</th>
+                                    <th>Descripción</th>
+                                    <th style="width: 100px;">Precio</th>
+                                    <th style="width: 120px;">Stock Total</th>
+                                    <th style="width: 80px;">Estado</th>
+                                    <th style="width: 100px;">Creado</th>
+                                    <th style="width: 380px;">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for producto in page_obj %}
+                                <tr {% if not producto.activo %}class="table-secondary opacity-75"{% endif %}>
+                                    <td>{{ producto.id_producto }}</td>
+                                    <td>
+                                        <strong {% if not producto.activo %}class="text-muted"{% endif %}>
+                                            {{ producto.nombre }}
+                                            {% if not producto.activo %}<small class="text-danger">(INACTIVO)</small>{% endif %}
+                                        </strong>
+                                    </td>
+                                    <td>
+                                        {% if producto.descripcion|length > 50 %}
+                                            {{ producto.descripcion|slice:":50" }}...
+                                        {% else %}
+                                            {{ producto.descripcion }}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-success">${{ producto.precio_referencia|floatformat:2 }}</span>
+                                    </td>
+                                    <td>
+                                        {% with stock=producto.get_stock_total %}
+                                            {% if stock > 0 %}
+                                                <span class="badge bg-primary">{{ stock }} unidades</span>
+                                            {% else %}
+                                                <span class="badge bg-warning">Sin stock</span>
+                                            {% endif %}
+                                        {% endwith %}
+                                    </td>
+                                    <td>
+                                        {% if producto.activo %}
+                                            <span class="badge bg-success">Activo</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Inactivo</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ producto.fecha_creacion|date:"d/m/Y" }}</td>
+                                    <td>
+                                        <div class="d-flex flex-wrap gap-1">
+                                            <a href="{% url 'productos:detalle' producto.id_producto %}" class="btn btn-info btn-sm" title="Ver detalles">
+                                                <i class="fas fa-eye me-1"></i>Ver
+                                            </a>
+                                            <a href="{% url 'productos:editar' producto.id_producto %}" class="btn btn-warning btn-sm" title="Editar producto">
+                                                <i class="fas fa-edit me-1"></i>Editar
+                                            </a>
+                                            <a href="{% url 'inventario:por_producto' producto.id_producto %}" class="btn btn-secondary btn-sm" title="Ver inventario">
+                                                <i class="fas fa-warehouse me-1"></i>Stock
+                                            </a>
+                                            <button class="btn btn-{% if producto.activo %}outline-secondary{% else %}outline-success{% endif %} btn-sm" 
+                                                    data-producto-id="{{ producto.id_producto }}"
+                                                    onclick="toggleActivo(this)"
+                                                    title="{% if producto.activo %}Desactivar producto{% else %}Activar producto{% endif %}">
+                                                <i class="fas fa-{% if producto.activo %}pause{% else %}play{% endif %} me-1"></i>
+                                                {% if producto.activo %}Pausar{% else %}Activar{% endif %}
+                                            </button>
+                                            <a href="{% url 'productos:eliminar' producto.id_producto %}" class="btn btn-outline-danger btn-sm" title="Eliminar producto">
+                                                <i class="fas fa-trash me-1"></i>Eliminar
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="8" class="text-center py-4">
+                                        <i class="fas fa-inbox fa-2x text-muted mb-2"></i>
+                                        <p class="text-muted">No se encontraron productos</p>
+                                        <a href="{% url 'productos:crear' %}" class="btn btn-primary">
+                                            <i class="fas fa-plus"></i> Crear primer producto
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Paginación -->
+                    {% if page_obj.has_other_pages %}
+                    <div class="d-flex justify-content-between align-items-center mt-4">
+                        <div class="text-muted">
+                            <small>
+                                Mostrando productos {{ page_obj.start_index }} - {{ page_obj.end_index }} 
+                                de {{ page_obj.paginator.count }} total
+                            </small>
+                        </div>
+                        
+                        <nav aria-label="Paginación de productos">
+                            <ul class="pagination pagination-lg mb-0">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link px-3 py-2" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+                                           title="Primera página">
+                                            <i class="fas fa-angle-double-left"></i>
+                                            <span class="d-none d-sm-inline ms-1">Primera</span>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link px-3 py-2" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                           title="Página anterior">
+                                            <i class="fas fa-angle-left"></i>
+                                            <span class="d-none d-sm-inline ms-1">Anterior</span>
+                                        </a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link px-3 py-2 text-muted">
+                                            <i class="fas fa-angle-double-left"></i>
+                                            <span class="d-none d-sm-inline ms-1">Primera</span>
+                                        </span>
+                                    </li>
+                                    <li class="page-item disabled">
+                                        <span class="page-link px-3 py-2 text-muted">
+                                            <i class="fas fa-angle-left"></i>
+                                            <span class="d-none d-sm-inline ms-1">Anterior</span>
+                                        </span>
+                                    </li>
+                                {% endif %}
+
+                                <!-- Páginas numéricas cercanas -->
+                                {% for num in page_obj.paginator.page_range %}
+                                    {% if page_obj.number == num %}
+                                        <li class="page-item active">
+                                            <span class="page-link px-3 py-2 bg-primary border-primary">
+                                                <strong>{{ num }}</strong>
+                                            </span>
+                                        </li>
+                                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                        <li class="page-item">
+                                            <a class="page-link px-3 py-2" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                                {{ num }}
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link px-3 py-2" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                           title="Página siguiente">
+                                            <span class="d-none d-sm-inline me-1">Siguiente</span>
+                                            <i class="fas fa-angle-right"></i>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link px-3 py-2" href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                           title="Última página">
+                                            <span class="d-none d-sm-inline me-1">Última</span>
+                                            <i class="fas fa-angle-double-right"></i>
+                                        </a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link px-3 py-2 text-muted">
+                                            <span class="d-none d-sm-inline me-1">Siguiente</span>
+                                            <i class="fas fa-angle-right"></i>
+                                        </span>
+                                    </li>
+                                    <li class="page-item disabled">
+                                        <span class="page-link px-3 py-2 text-muted">
+                                            <span class="d-none d-sm-inline me-1">Última</span>
+                                            <i class="fas fa-angle-double-right"></i>
+                                        </span>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                        
+                        <div class="text-muted">
+                            <small>
+                                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                            </small>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleActivo(buttonElement) {
+    const productId = buttonElement.getAttribute('data-producto-id');
+    fetch(`/productos/${productId}/toggle-activo/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Error: ' + data.mensaje);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error al actualizar el producto');
+    });
+}
+
+// Auto-enviar formulario cuando cambian los filtros
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const inputs = form.querySelectorAll('input, select');
+    let timeout;
+    
+    inputs.forEach(input => {
+        input.addEventListener('input', function() {
+            // Limpiar timeout anterior
+            clearTimeout(timeout);
+            
+            // Esperar 500ms después de que el usuario deje de escribir
+            timeout = setTimeout(() => {
+                form.submit();
+            }, 500);
+        });
+        
+        // Para selects, enviar inmediatamente
+        if (input.tagName === 'SELECT') {
+            input.addEventListener('change', function() {
+                clearTimeout(timeout);
+                form.submit();
+            });
+        }
+    });
+    
+    // Prevenir envío múltiple del formulario
+    form.addEventListener('submit', function(e) {
+        const submitBtn = form.querySelector('button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Aplicando...';
+            
+            // Re-habilitar después de un momento
+            setTimeout(() => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-filter me-1"></i>Aplicar';
+            }, 1000);
+        }
+    });
+});
+</script>
+
+<style>
+/* Estilos personalizados para los botones de acción */
+.d-flex.gap-1 > * {
+    margin-bottom: 2px;
+}
+
+.btn-sm {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    min-width: 70px;
+    white-space: nowrap;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+/* Estilos mejorados para paginación */
+.pagination-lg .page-link {
+    font-size: 1rem;
+    font-weight: 500;
+    border: 2px solid #dee2e6;
+    color: #495057;
+    transition: all 0.3s ease;
+    margin: 0 2px;
+    border-radius: 8px !important;
+}
+
+.pagination-lg .page-link:hover {
+    background-color: #e9ecef;
+    border-color: #adb5bd;
+    color: #212529;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.pagination-lg .page-item.active .page-link {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: white;
+    box-shadow: 0 2px 8px rgba(0,123,255,0.3);
+}
+
+.pagination-lg .page-item.disabled .page-link {
+    color: #6c757d;
+    background-color: #fff;
+    border-color: #dee2e6;
+    opacity: 0.5;
+}
+
+/* Información de paginación */
+.text-muted small {
+    font-size: 0.875rem;
+    color: #6c757d !important;
+}
+
+/* Responsive para paginación */
+@media (max-width: 768px) {
+    .d-flex.justify-content-between {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .pagination-lg {
+        justify-content: center;
+        margin: 1rem 0;
+    }
+    
+    .pagination-lg .page-link {
+        font-size: 0.875rem;
+        padding: 0.5rem 0.75rem;
+        margin: 0 1px;
+    }
+    
+    .d-none.d-sm-inline {
+        display: none !important;
+    }
+}
+
+/* Responsive para botones en móviles */
+@media (max-width: 768px) {
+    .d-flex.flex-wrap {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .btn-sm {
+        margin-bottom: 3px;
+        min-width: auto;
+    }
+}
+
+/* Animación para hover en botones de paginación */
+.page-link {
+    position: relative;
+    overflow: hidden;
+}
+
+.page-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+}
+
+.page-link:hover::before {
+    left: 100%;
+}
+</style>
+
+{% endblock %}

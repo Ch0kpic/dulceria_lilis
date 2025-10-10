@@ -1,0 +1,74 @@
+[
+  {
+    "model": "proveedores.proveedor",
+    "pk": 1,
+    "fields": {
+      "nombre": "Chocolates Belgas Import S.A.",
+      "contacto": "María González",
+      "telefono": "+57 1 234-5678",
+      "email": "contacto@chocolatesbelgas.com",
+      "direccion": "Calle 72 #10-34, Bogotá",
+      "activo": true
+    }
+  },
+  {
+    "model": "proveedores.proveedor",
+    "pk": 2,
+    "fields": {
+      "nombre": "Dulces Artesanales La Abuela",
+      "contacto": "Carlos Ramírez",
+      "telefono": "+57 2 456-7890", 
+      "email": "pedidos@dulceslaabuela.com",
+      "direccion": "Carrera 15 #45-67, Cali",
+      "activo": true
+    }
+  },
+  {
+    "model": "proveedores.proveedor",
+    "pk": 3,
+    "fields": {
+      "nombre": "Ingredientes Premium Ltda.",
+      "contacto": "Ana Sofía Torres",
+      "telefono": "+57 4 789-0123",
+      "email": "ventas@ingredientespremium.co",
+      "direccion": "Avenida Poblado #25-80, Medellín",
+      "activo": true
+    }
+  },
+  {
+    "model": "proveedores.proveedor",
+    "pk": 4,
+    "fields": {
+      "nombre": "Sabores Naturales del Huila",
+      "contacto": "Jorge Andrés Martínez",
+      "telefono": "+57 8 321-6549",
+      "email": "info@saboreshuila.com",
+      "direccion": "Km 5 vía Neiva-Palermo, Huila",
+      "activo": true
+    }
+  },
+  {
+    "model": "proveedores.proveedor",
+    "pk": 5,
+    "fields": {
+      "nombre": "Empaques y Decoración Dulce",
+      "contacto": "Luisa Fernanda Pérez",
+      "telefono": "+57 5 654-9870",
+      "email": "pedidos@empaquesdulce.com",
+      "direccion": "Zona Industrial Mamonal, Cartagena",
+      "activo": true
+    }
+  },
+  {
+    "model": "proveedores.proveedor",
+    "pk": 6,
+    "fields": {
+      "nombre": "Máquinas para Dulcería Express",
+      "contacto": "Roberto Silva",
+      "telefono": "+57 1 987-4561",
+      "email": "servicio@maquinasdulce.net",
+      "direccion": "Zona Franca de Bogotá, Local 45",
+      "activo": true
+    }
+  }
+]

@@ -1,0 +1,202 @@
+[
+  {
+    "model": "productos.producto",
+    "pk": 11,
+    "fields": {
+      "nombre": "Cake Pops de Vainilla",
+      "descripcion": "Deliciosos cake pops bañados en chocolate blanco con decoración colorida",
+      "precio_referencia": "2800.00",
+      "activo": true
+    }
+  },
+  {
+    "model": "productos.producto",
+    "pk": 12,
+    "fields": {
+      "nombre": "Macarons Franceses",
+      "descripcion": "Elegantes macarons con rellenos de ganache de diferentes sabores: limón, frambuesa, chocolate y vainilla",
+      "precio_referencia": "3500.00",
+      "activo": true
+    }
+  },
+  {
+    "model": "productos.producto",
+    "pk": 13,
+    "fields": {
+      "nombre": "Trufas de Champagne",
+      "descripcion": "Exclusivas trufas de chocolate negro rellenas de ganache de champagne",
+      "precio_referencia": "12000.00",
+      "activo": true
+    }
+  },
+  {
+    "model": "productos.producto",
+    "pk": 14,
+    "fields": {
+      "nombre": "Piruletas Artesanales",
+      "descripcion": "Piruletas hechas a mano con azúcar glass y colorantes naturales, diseños únicos",
+      "precio_referencia": "1400.00",
+      "activo": true
+    }
+  },
+  {
+    "model": "productos.producto",
+    "pk": 15,
+    "fields": {
+      "nombre": "Brownies de Nutella",
+      "descripcion": "Brownies húmedos con Nutella y trozos de avellanas, cortados en porciones individuales",
+      "precio_referencia": "3800.00",
+      "activo": true
+    }
+  },
+  {
+    "model": "productos.producto",
+    "pk": 16,
+    "fields": {
+      "nombre": "Ositos de Goma Premium",
+      "descripcion": "Ositos de goma gourmet con sabores exóticos: mango, maracuyá, lychee y té verde",
+      "precio_referencia": "2200.00",
+      "activo": true
+    }
+  },
+  {
+    "model": "productos.producto",
+    "pk": 17,
+    "fields": {
+      "nombre": "Chocolates Rellenos de Licor",
+      "descripcion": "Chocolates negros rellenos con licores premium: baileys, amaretto, cointreau",
+      "precio_referencia": "15000.00",
+      "activo": true
+    }
+  },
+  {
+    "model": "productos.producto",
+    "pk": 18,
+    "fields": {
+      "nombre": "Malvaviscos de Fresa",
+      "descripcion": "Malvaviscos artesanales sabor fresa natural, suaves y esponjosos",
+      "precio_referencia": "1800.00",
+      "activo": true
+    }
+  },
+  {
+    "model": "productos.producto",
+    "pk": 19,
+    "fields": {
+      "nombre": "Helados de Paleta Gourmet",
+      "descripcion": "Paletas heladas gourmet con frutas naturales y chocolate belga",
+      "precio_referencia": "4200.00",
+      "activo": true
+    }
+  },
+  {
+    "model": "productos.producto",
+    "pk": 20,
+    "fields": {
+      "nombre": "Donuts Glaseados",
+      "descripcion": "Donuts frescos con glaseado de diferentes sabores: chocolate, fresa, limón y caramelo",
+      "precio_referencia": "2600.00",
+      "activo": true
+    }
+  },
+  {
+    "model": "productos.producto",
+    "pk": 21,
+    "fields": {
+      "nombre": "Cajas de Chocolates Personalizadas",
+      "descripcion": "Elegantes cajas con surtido de chocolates finos, ideales para regalos corporativos",
+      "precio_referencia": "25000.00",
+      "activo": true
+    }
+  },
+  {
+    "model": "productos.producto",
+    "pk": 22,
+    "fields": {
+      "nombre": "Galletas Decoradas",
+      "descripcion": "Galletas de mantequilla decoradas con glasa real para eventos especiales",
+      "precio_referencia": "3200.00",
+      "activo": true
+    }
+  },
+  {
+    "model": "productos.producto",
+    "pk": 23,
+    "fields": {
+      "nombre": "Algodón de Azúcar Sabores",
+      "descripcion": "Algodón de azúcar en diferentes sabores: cereza, manzana verde, uva y tutti frutti",
+      "precio_referencia": "1500.00",
+      "activo": true
+    }
+  },
+  {
+    "model": "productos.producto",
+    "pk": 24,
+    "fields": {
+      "nombre": "Bombones de Café",
+      "descripcion": "Bombones de chocolate rellenos con ganache de café espresso colombiano",
+      "precio_referencia": "6800.00",
+      "activo": true
+    }
+  },
+  {
+    "model": "productos.producto",
+    "pk": 25,
+    "fields": {
+      "nombre": "Pastillas de Menta",
+      "descripcion": "Pastillas refrescantes de menta con aceites esenciales naturales",
+      "precio_referencia": "900.00",
+      "activo": true
+    }
+  },
+  {
+    "model": "productos.producto",
+    "pk": 26,
+    "fields": {
+      "nombre": "Cupcakes Red Velvet",
+      "descripcion": "Cupcakes de terciopelo rojo con frosting de queso crema y decoración elegante",
+      "precio_referencia": "4500.00",
+      "activo": true
+    }
+  },
+  {
+    "model": "productos.producto",
+    "pk": 27,
+    "fields": {
+      "nombre": "Chocolates Sin Azúcar",
+      "descripcion": "Línea de chocolates endulzados con stevia, perfectos para diabéticos",
+      "precio_referencia": "7500.00",
+      "activo": true
+    }
+  },
+  {
+    "model": "productos.producto",
+    "pk": 28,
+    "fields": {
+      "nombre": "Gelatinas Artesanales",
+      "descripcion": "Gelatinas con formas divertidas y sabores naturales de frutas de temporada",
+      "precio_referencia": "1100.00",
+      "activo": true
+    }
+  },
+  {
+    "model": "productos.producto",
+    "pk": 29,
+    "fields": {
+      "nombre": "Tabletas de Chocolate Orgánico",
+      "descripcion": "Tabletas de chocolate negro 70% cacao orgánico con certificación fair trade",
+      "precio_referencia": "8900.00",
+      "activo": true
+    }
+  },
+  {
+    "model": "productos.producto",
+    "pk": 30,
+    "fields": {
+      "nombre": "Mini Cheesecakes",
+      "descripcion": "Mini cheesecakes individuales con diferentes toppings: frutos rojos, caramelo y chocolate",
+      "precio_referencia": "5200.00",
+      "activo": true
+    }
+  }
+]

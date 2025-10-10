@@ -1,0 +1,107 @@
+[
+  {
+    "model": "roles.rol",
+    "pk": 1,
+    "fields": {
+      "nombre": "Administrador",
+      "descripcion": "Usuario con acceso completo al sistema",
+      "tipo": "admin",
+      "puede_ver_ventas": true,
+      "puede_crear_ventas": true,
+      "puede_ver_inventario": true,
+      "puede_modificar_inventario": true,
+      "puede_ver_clientes": true,
+      "puede_crear_clientes": true,
+      "puede_ver_proveedores": true,
+      "puede_crear_proveedores": true,
+      "puede_ver_productos": true,
+      "puede_crear_productos": true,
+      "puede_ver_usuarios": true,
+      "puede_crear_usuarios": true
+    }
+  },
+  {
+    "model": "roles.rol",
+    "pk": 2,
+    "fields": {
+      "nombre": "Jefe de Ventas",
+      "descripcion": "Usuario encargado de supervisar las ventas",
+      "tipo": "jefe_ventas",
+      "puede_ver_ventas": true,
+      "puede_crear_ventas": true,
+      "puede_ver_inventario": true,
+      "puede_modificar_inventario": false,
+      "puede_ver_clientes": true,
+      "puede_crear_clientes": true,
+      "puede_ver_proveedores": true,
+      "puede_crear_proveedores": false,
+      "puede_ver_productos": true,
+      "puede_crear_productos": false,
+      "puede_ver_usuarios": false,
+      "puede_crear_usuarios": false
+    }
+  },
+  {
+    "model": "roles.rol",
+    "pk": 3,
+    "fields": {
+      "nombre": "Vendedor",
+      "descripcion": "Usuario vendedor con acceso limitado a ventas",
+      "tipo": "vendedor",
+      "puede_ver_ventas": true,
+      "puede_crear_ventas": true,
+      "puede_ver_inventario": true,
+      "puede_modificar_inventario": false,
+      "puede_ver_clientes": true,
+      "puede_crear_clientes": true,
+      "puede_ver_proveedores": false,
+      "puede_crear_proveedores": false,
+      "puede_ver_productos": true,
+      "puede_crear_productos": false,
+      "puede_ver_usuarios": false,
+      "puede_crear_usuarios": false
+    }
+  },
+  {
+    "model": "roles.rol",
+    "pk": 4,
+    "fields": {
+      "nombre": "Bodeguero",
+      "descripcion": "Usuario encargado del inventario y almacén",
+      "tipo": "bodeguero",
+      "puede_ver_ventas": false,
+      "puede_crear_ventas": false,
+      "puede_ver_inventario": true,
+      "puede_modificar_inventario": true,
+      "puede_ver_clientes": false,
+      "puede_crear_clientes": false,
+      "puede_ver_proveedores": true,
+      "puede_crear_proveedores": true,
+      "puede_ver_productos": true,
+      "puede_crear_productos": true,
+      "puede_ver_usuarios": false,
+      "puede_crear_usuarios": false
+    }
+  },
+  {
+    "model": "roles.rol",
+    "pk": 5,
+    "fields": {
+      "nombre": "Cliente",
+      "descripcion": "Usuario cliente con acceso muy limitado",
+      "tipo": "cliente",
+      "puede_ver_ventas": false,
+      "puede_crear_ventas": false,
+      "puede_ver_inventario": false,
+      "puede_modificar_inventario": false,
+      "puede_ver_clientes": false,
+      "puede_crear_clientes": false,
+      "puede_ver_proveedores": false,
+      "puede_crear_proveedores": false,
+      "puede_ver_productos": true,
+      "puede_crear_productos": false,
+      "puede_ver_usuarios": false,
+      "puede_crear_usuarios": false
+    }
+  }
+]

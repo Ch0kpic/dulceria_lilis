@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard Operador - Dulcería Lilis{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="bi bi-box-seam text-primary"></i> Dashboard - Operador de Bodega
+                <small class="text-muted">Bienvenido, {{ user.nombre|default:user.username }}</small>
+            </h1>
+        </div>
+    </div>
+
+    <!-- Cards específicos para Operador de Bodega -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card bg-primary text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Stock Total</h5>
+                            <h2 class="mb-0">1,245</h2>
+                            <p class="mb-0">Productos en inventario</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-boxes" style="font-size: 2rem;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card bg-warning text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Stock Bajo</h5>
+                            <h2 class="mb-0">12</h2>
+                            <p class="mb-0">Productos con stock mínimo</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-exclamation-triangle" style="font-size: 2rem;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card bg-success text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Entradas Hoy</h5>
+                            <h2 class="mb-0">48</h2>
+                            <p class="mb-0">Movimientos de entrada</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-arrow-down-circle" style="font-size: 2rem;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card bg-danger text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Salidas Hoy</h5>
+                            <h2 class="mb-0">32</h2>
+                            <p class="mb-0">Movimientos de salida</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-arrow-up-circle" style="font-size: 2rem;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Acciones específicas del Operador de Bodega -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h3 class="mb-3">Gestión de Inventario</h3>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-plus-circle"></i> Alta de Productos</h5>
+                </div>
+                <div class="card-body">
+                    <p>Registra nuevos productos con lote y fecha de vencimiento para control de trazabilidad.</p>
+                    <div class="row">
+                        <div class="col-6">
+                            <a href="#" class="btn btn-primary btn-sm w-100 mb-2">
+                                <i class="bi bi-plus-circle"></i> Nuevo Producto
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="#" class="btn btn-outline-primary btn-sm w-100 mb-2">
+                                <i class="bi bi-qr-code"></i> Asignar Lote
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-arrow-up-down"></i> Movimientos</h5>
+                </div>
+                <div class="card-body">
+                    <p>Registra entradas y salidas de productos para mantener stock actualizado.</p>
+                    <div class="row">
+                        <div class="col-6">
+                            <a href="#" class="btn btn-success btn-sm w-100 mb-2">
+                                <i class="bi bi-arrow-down"></i> Registrar Entrada
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="#" class="btn btn-outline-success btn-sm w-100 mb-2">
+                                <i class="bi bi-arrow-up"></i> Registrar Salida
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reportes específicos -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-file-earmark-text"></i> Reportes de Inventario</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <a href="#" class="btn btn-outline-info w-100 mb-2">
+                                <i class="bi bi-geo-alt"></i> Stock por Ubicación
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="#" class="btn btn-outline-info w-100 mb-2">
+                                <i class="bi bi-calendar-date"></i> Productos por Vencer
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="#" class="btn btn-outline-info w-100 mb-2">
+                                <i class="bi bi-graph-up"></i> Movimientos del Día
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alertas específicas -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-bell text-warning"></i> Alertas de Inventario</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning" role="alert">
+                        <i class="bi bi-exclamation-triangle"></i> 
+                        <strong>Stock Mínimo:</strong> Alfajor de Dulce de Leche - Solo quedan 5 unidades (Mín: 20)
+                    </div>
+                    <div class="alert alert-danger" role="alert">
+                        <i class="bi bi-calendar-x"></i> 
+                        <strong>Próximo a Vencer:</strong> Lote #L001 de Gomitas vence en 3 días
+                    </div>
+                    <div class="alert alert-info" role="alert">
+                        <i class="bi bi-info-circle"></i> 
+                        <strong>Reubicación:</strong> Producto en zona A-15 necesita ser movido a zona B-03
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
