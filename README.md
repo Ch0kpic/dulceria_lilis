@@ -21,7 +21,7 @@ Sistema web desarrollado en Django para la gestión integral de una dulcería, i
 ## Instalación Rápida para Laboratorio
 
 ### Prerrequisitos
-- WAMP Server instalado y funcionando
+- WAMP Server instalado y funcionando (ícono verde)
 - Python 3.11+ instalado
 - Git instalado
 
@@ -33,29 +33,37 @@ Sistema web desarrollado en Django para la gestión integral de una dulcería, i
    cd dulceria_lilis
    ```
 
-2. **Ejecutar instalación automática**:
-   ```batch
-   instalacion_rapida.bat
+2. **Crear entorno virtual e instalar dependencias**:
+   ```bash
+   python -m venv env
+   env\Scripts\activate
+   pip install -r requirements.txt
    ```
 
-   Este script automáticamente:
-   - Crea el entorno virtual
-   - Instala las dependencias
-   - Configura la base de datos MySQL
-   - Ejecuta las migraciones
-   - Carga datos de prueba
-   - Crea superusuario (admin/admin123)
+3. **Configurar MySQL con WAMP (RECOMENDADO)**:
+   ```batch
+   resetear_mysql.bat
+   ```
 
-3. **Iniciar el servidor**:
+   **Alternativas disponibles:**
+   - `setup_django_mysql.bat` - Configuración directa
+   - `instalacion_rapida.bat` - Script original
+   - `limpiar_importar_bd.bat` - Importar SQL
+
+4. **Iniciar el servidor**:
    ```bash
-   env\Scripts\activate
    cd dulceria
    python manage.py runserver
    ```
 
-4. **Acceder al sistema**:
-   - URL: http://127.0.0.1:8000
-   - Admin: usuario `admin` / contraseña `admin123`
+5. **Acceder al sistema**:
+   - **Django**: http://127.0.0.1:8000
+   - **phpMyAdmin**: http://localhost/phpmyadmin (BD: dulceria_lilis)
+   - **Admin**: usuario `admin` / contraseña `admin123`
+
+### 🎯 **Para Presentación en Laboratorio**
+El sistema está configurado para **MySQL + WAMP** automáticamente.
+Ejecutar `resetear_mysql.bat` garantiza configuración limpia y funcional.
 
 ## Datos de Prueba Incluidos
 
