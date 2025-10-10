@@ -1,0 +1,68 @@
+[
+{
+  "model": "usuarios.usuario",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$dPTrq5Js4rlgDGIFtCE47W$L06TmcupqvmRw0/LhawgvfyvxHaqnQW3JNhTMGo/xUo=",
+    "last_login": "2025-10-09T21:43:37.911Z",
+    "is_superuser": true,
+    "username": "admin",
+    "first_name": "",
+    "last_name": "",
+    "email": "admin@dulceria.cl",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-10-08T17:40:26.810Z",
+    "nombre": "",
+    "correo": "",
+    "contrasena": "",
+    "id_rol": null,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "usuarios.usuario",
+  "pk": 2,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$hkGNh5ALSv5YKKEavRMAeg$jC8EdziGtFqM30dhLgIWoRsN6/2UAn/hduUdOwLgEQI=",
+    "last_login": "2025-10-09T21:31:24.122Z",
+    "is_superuser": false,
+    "username": "dylan",
+    "first_name": "",
+    "last_name": "",
+    "email": "dylanjbs01@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-10-08T17:57:25.922Z",
+    "nombre": "barraza",
+    "correo": "dylanjbs01@gmail.com",
+    "contrasena": "",
+    "id_rol": 2,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "usuarios.usuario",
+  "pk": 3,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$T9wtqN51NtxH5EHpY9n6Qk$TqNJvGaMicmpUBzL0EF+UJIwfJMQ3osVetotOlJHbL4=",
+    "last_login": "2025-10-09T01:54:37.759Z",
+    "is_superuser": false,
+    "username": "pepe",
+    "first_name": "",
+    "last_name": "",
+    "email": "pepe@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-10-08T18:17:39.063Z",
+    "nombre": "cardenas",
+    "correo": "pepe@gmail.com",
+    "contrasena": "",
+    "id_rol": 1,
+    "groups": [],
+    "user_permissions": []
+  }
+}
+]

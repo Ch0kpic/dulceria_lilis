@@ -1,0 +1,44 @@
+[
+{
+  "model": "roles.rol",
+  "pk": 1,
+  "fields": {
+    "nombre": "Operador de Bodega",
+    "descripcion": "Gestión de inventario, registrar entradas y salidas de productos, control de stock y ubicaciones",
+    "tipo": "cliente",
+    "puede_ver_ventas": false,
+    "puede_crear_ventas": false,
+    "puede_ver_inventario": false,
+    "puede_modificar_inventario": false,
+    "puede_ver_clientes": false,
+    "puede_crear_clientes": false,
+    "puede_ver_proveedores": false,
+    "puede_crear_proveedores": false,
+    "puede_ver_productos": false,
+    "puede_crear_productos": false,
+    "puede_ver_usuarios": false,
+    "puede_crear_usuarios": false
+  }
+},
+{
+  "model": "roles.rol",
+  "pk": 2,
+  "fields": {
+    "nombre": "Comprador",
+    "descripcion": "Evaluar proveedores, crear solicitudes de compra, gestionar órdenes de compra",
+    "tipo": "cliente",
+    "puede_ver_ventas": false,
+    "puede_crear_ventas": false,
+    "puede_ver_inventario": false,
+    "puede_modificar_inventario": false,
+    "puede_ver_clientes": false,
+    "puede_crear_clientes": false,
+    "puede_ver_proveedores": false,
+    "puede_crear_proveedores": false,
+    "puede_ver_productos": false,
+    "puede_crear_productos": false,
+    "puede_ver_usuarios": false,
+    "puede_crear_usuarios": false
+  }
+}
+]
