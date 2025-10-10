@@ -249,3 +249,6 @@ $RECYCLE.BIN/
 *.msm
 *.msp
 *.lnk
+
+# Base de datos SQL (comentar si quieres incluir en git)
+# *.sql
