@@ -87,15 +87,23 @@ if %errorlevel% neq 0 (
 )
 
 REM Cargar datos de prueba
-echo [6/7] Cargando datos de ejemplo...
-python manage.py loaddata fixtures_roles.json 2>nul
+REM Configurar archivo .env
+echo [6/8] Configurando variables de entorno...
+if not exist ".env" (
+    echo DEBUG=True > ".env"
+    echo SECRET_KEY=django-insecure-development-key-change-in-production >> ".env"
+    echo DATABASE_ENGINE=sqlite3 >> ".env"
+    echo Archivo .env creado para SQLite
+)
+
+echo [7/8] Cargando datos de ejemplo...
 python manage.py inicializar_dulceria
 if %errorlevel% neq 0 (
     echo Advertencia: Algunos datos no se pudieron cargar, pero el sistema funcionará
 )
 
 REM Crear superusuario (opcional)
-echo [7/7] Creando superusuario...
+echo [8/8] Verificando superusuario...
 python -c "
 import os, django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'dulceria.settings')

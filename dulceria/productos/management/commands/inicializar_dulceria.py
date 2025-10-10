@@ -47,23 +47,59 @@ class Command(BaseCommand):
                         self.style.WARNING(f"   ⚠️  Roles: {str(e)}")
                     )
             
-            # 2. Cargar proveedores (si no es solo productos)
+            # 2. Cargar usuarios (si no es solo productos)
+            if not options['productos_only']:
+                self.stdout.write("👤 Cargando usuarios de prueba...")
+                try:
+                    call_command('loaddata', 'fixtures_usuarios.json', verbosity=0)
+                    from usuarios.models import Usuario
+                    usuarios_count = Usuario.objects.count()
+                    self.stdout.write(
+                        self.style.SUCCESS(f"   ✅ {usuarios_count} usuarios cargados")
+                    )
+                except Exception as e:
+                    self.stdout.write(
+                        self.style.WARNING(f"   ⚠️  Usuarios: {str(e)}")
+                    )
+            
+            # 3. Cargar proveedores (si no es solo productos)
             if not options['productos_only']:
                 self.stdout.write("🚚 Cargando proveedores...")
-                call_command('loaddata', 'fixtures_proveedores.json', verbosity=0)
-                proveedores_count = Proveedor.objects.count()
+                try:
+                    call_command('loaddata', 'fixtures_proveedores.json', verbosity=0)
+                    proveedores_count = Proveedor.objects.count()
+                    self.stdout.write(
+                        self.style.SUCCESS(f"   ✅ {proveedores_count} proveedores cargados")
+                    )
+                except Exception as e:
+                    self.stdout.write(
+                        self.style.WARNING(f"   ⚠️  Proveedores: {str(e)}")
+                    )
+            
+            # 4. Cargar productos básicos
+            self.stdout.write("🍬 Cargando productos básicos...")
+            try:
+                call_command('loaddata', 'fixtures_productos.json', verbosity=0)
+                productos_basicos = Producto.objects.count()
                 self.stdout.write(
-                    self.style.SUCCESS(f"   ✅ {proveedores_count} proveedores cargados")
+                    self.style.SUCCESS(f"   ✅ Productos básicos cargados")
+                )
+            except Exception as e:
+                self.stdout.write(
+                    self.style.WARNING(f"   ⚠️  Productos básicos: {str(e)}")
                 )
             
-            # 3. Cargar productos básicos
-            self.stdout.write("🍬 Cargando productos básicos...")
-            call_command('loaddata', 'fixtures_productos.json', verbosity=0)
-            productos_basicos = Producto.objects.count()
-            
-            # 4. Cargar productos premium
+            # 5. Cargar productos premium
             self.stdout.write("✨ Cargando productos premium...")
-            call_command('loaddata', 'fixtures_productos_premium.json', verbosity=0)
+            try:
+                call_command('loaddata', 'fixtures_productos_premium.json', verbosity=0)
+                self.stdout.write(
+                    self.style.SUCCESS(f"   ✅ Productos premium cargados")
+                )
+            except Exception as e:
+                self.stdout.write(
+                    self.style.WARNING(f"   ⚠️  Productos premium: {str(e)}")
+                )
             
             # Estadísticas finales
             total_productos = Producto.objects.count()
@@ -77,6 +113,8 @@ class Command(BaseCommand):
             self.stdout.write(f"\n📊 RESUMEN:")
             if not options['productos_only']:
                 self.stdout.write(f"   👥 Roles: {Rol.objects.count()}")
+                from usuarios.models import Usuario
+                self.stdout.write(f"   👤 Usuarios: {Usuario.objects.count()}")
                 self.stdout.write(f"   🚚 Proveedores: {Proveedor.objects.count()}")
             self.stdout.write(f"   🍬 Productos totales: {total_productos}")
             self.stdout.write(f"   🟢 Productos activos: {productos_activos}")

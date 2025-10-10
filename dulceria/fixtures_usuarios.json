@@ -1,0 +1,62 @@
+[
+  {
+    "model": "usuarios.usuario",
+    "pk": 1,
+    "fields": {
+      "password": "pbkdf2_sha256$870000$S1xMx8YvJ8aG3oDw9vDV1D$n2MJLzz7x+3LQpGDzvGJ2rxCjn7nUwJeQvFzn+Xz8Xw=",
+      "last_login": null,
+      "is_superuser": true,
+      "username": "admin",
+      "first_name": "Administrador",
+      "last_name": "Sistema",
+      "email": "admin@dulceria.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2024-10-10T12:00:00Z",
+      "nombre": "Administrador Sistema",
+      "correo": "admin@dulceria.com",
+      "contrasena": "",
+      "id_rol": 1
+    }
+  },
+  {
+    "model": "usuarios.usuario",
+    "pk": 2,
+    "fields": {
+      "password": "pbkdf2_sha256$870000$XcRtYhGfJ1wH2mCk7zEV9A$8vLpQrS3x+9NDtGJxvGM5nxDjm4mUwKeRvFwn+Xy7Yw=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "vendedor",
+      "first_name": "María",
+      "last_name": "González",
+      "email": "vendedor@dulceria.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-10-10T12:00:00Z",
+      "nombre": "María González",
+      "correo": "vendedor@dulceria.com",
+      "contrasena": "",
+      "id_rol": 2
+    }
+  },
+  {
+    "model": "usuarios.usuario",
+    "pk": 3,
+    "fields": {
+      "password": "pbkdf2_sha256$870000$YdStZhIfK2xI3nDl8aFW0B$9wMqRsT4y+0OEuHKyvHN6oyEkn5nVwLfSwGxo+Yz8Zx=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "comprador",
+      "first_name": "Carlos",
+      "last_name": "Ramírez",
+      "email": "comprador@dulceria.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-10-10T12:00:00Z",
+      "nombre": "Carlos Ramírez",
+      "correo": "comprador@dulceria.com",
+      "contrasena": "",
+      "id_rol": 3
+    }
+  }
+]
