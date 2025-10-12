@@ -10,12 +10,14 @@ cd prueba
 
 ### 2. **Copiar el archivo de configuración:**
 ```bash
-# En Windows
-copy env.example .env
+# En Windows (el archivo .env.example ya tiene el punto al inicio)
+copy .env.example .env
 
 # En Linux/Mac
-cp env.example .env
+cp .env.example .env
 ```
+
+**Nota:** El archivo `.env.example` ya tiene el punto al inicio, por lo que Windows lo reconocerá como archivo de configuración y le mostrará el ícono de la tuerca 🔧.
 
 ### 3. **Editar el archivo .env:**
 Abrir el archivo `.env` y cambiar solo los valores que necesites:
