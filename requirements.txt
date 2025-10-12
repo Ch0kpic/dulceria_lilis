@@ -1,0 +1,32 @@
+# Django - Framework web principal
+Django==5.2.7
+
+# Gestión de variables de entorno
+python-decouple==3.8
+
+# Conector para MySQL
+mysqlclient==2.2.7
+
+# Utilidades adicionales (opcionales pero recomendadas)
+Pillow==10.4.0  # Para manejo de imágenes (futuro)
+python-dateutil==2.9.0  # Para manejo de fechas
+pytz==2024.2  # Zona horaria
+
+# Herramientas de desarrollo (opcionales)
+django-debug-toolbar==4.4.6  # Para debugging en desarrollo
+django-extensions==3.2.3  # Comandos adicionales de Django
+
+# Validación de datos
+django-crispy-forms==2.3  # Para formularios más elegantes
+crispy-bootstrap5==2024.2  # Bootstrap 5 para crispy forms
+
+# API REST (para futuro desarrollo)
+djangorestframework==3.15.2
+django-cors-headers==4.6.0
+
+# Testing
+pytest==8.3.3
+pytest-django==4.9.0
+
+# Seguridad
+django-ratelimit==4.1.0  # Para limitar requests

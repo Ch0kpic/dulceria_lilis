@@ -1,0 +1,215 @@
+[
+  {
+    "model": "roles.rol",
+    "pk": 1,
+    "fields": {
+      "nombre": "Administrador",
+      "descripcion": "Administrador del sistema con todos los permisos"
+    }
+  },
+  {
+    "model": "roles.rol",
+    "pk": 2,
+    "fields": {
+      "nombre": "Vendedor",
+      "descripcion": "Vendedor con acceso limitado a inventarios y productos"
+    }
+  },
+  {
+    "model": "roles.rol",
+    "pk": 3,
+    "fields": {
+      "nombre": "Bodeguero",
+      "descripcion": "Encargado de inventarios y productos"
+    }
+  },
+  {
+    "model": "roles.rol",
+    "pk": 4,
+    "fields": {
+      "nombre": "Cliente",
+      "descripcion": "Cliente con acceso de solo lectura"
+    }
+  },
+  {
+    "model": "usuarios.usuario",
+    "pk": 2,
+    "fields": {
+      "password": "pbkdf2_sha256$600000$test$example",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "vendedor1",
+      "first_name": "",
+      "last_name": "",
+      "email": "vendedor1@dulceria.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2024-01-01T10:00:00Z",
+      "nombre": "Carlos Vendedor",
+      "correo": "vendedor1@dulceria.com",
+      "contrasena": "vendedor123",
+      "id_rol": 2,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "usuarios.usuario",
+    "pk": 3,
+    "fields": {
+      "password": "pbkdf2_sha256$600000$test$example",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "bodeguero1",
+      "first_name": "",
+      "last_name": "",
+      "email": "bodeguero1@dulceria.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2024-01-01T10:00:00Z",
+      "nombre": "María Bodeguera",
+      "correo": "bodeguero1@dulceria.com",
+      "contrasena": "bodeguero123",
+      "id_rol": 3,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "usuarios.usuario",
+    "pk": 4,
+    "fields": {
+      "password": "pbkdf2_sha256$600000$test$example",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "cliente1",
+      "first_name": "",
+      "last_name": "",
+      "email": "cliente1@dulceria.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-01-01T10:00:00Z",
+      "nombre": "Ana Cliente",
+      "correo": "cliente1@dulceria.com",
+      "contrasena": "cliente123",
+      "id_rol": 4,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "productos.producto",
+    "pk": 1,
+    "fields": {
+      "nombre": "Chocolate Hershey's",
+      "descripcion": "Chocolate de leche Hershey's 43g",
+      "precio_referencia": 2500
+    }
+  },
+  {
+    "model": "productos.producto",
+    "pk": 2,
+    "fields": {
+      "nombre": "Gomitas Trululu",
+      "descripcion": "Gomitas de colores sabor fresa 50g",
+      "precio_referencia": 1800
+    }
+  },
+  {
+    "model": "productos.producto",
+    "pk": 3,
+    "fields": {
+      "nombre": "Caramelos Mentitas",
+      "descripcion": "Caramelos de menta refrescante 40g",
+      "precio_referencia": 1200
+    }
+  },
+  {
+    "model": "productos.producto",
+    "pk": 4,
+    "fields": {
+      "nombre": "Chicles Bubbaloo",
+      "descripcion": "Chicles con centro líquido sabor fresa 25g",
+      "precio_referencia": 2200
+    }
+  },
+  {
+    "model": "productos.producto",
+    "pk": 5,
+    "fields": {
+      "nombre": "Galletas Oreo",
+      "descripcion": "Galletas sándwich con crema de vainilla 150g",
+      "precio_referencia": 4200
+    }
+  },
+  {
+    "model": "inventarios.inventario",
+    "pk": 1,
+    "fields": {
+      "id_producto": 1,
+      "cantidad_actual": 50,
+      "ubicacion": "Estante A1",
+      "fecha_ultima_actualizacion": "2024-01-15T14:30:00Z"
+    }
+  },
+  {
+    "model": "inventarios.inventario",
+    "pk": 2,
+    "fields": {
+      "id_producto": 2,
+      "cantidad_actual": 75,
+      "ubicacion": "Estante B2",
+      "fecha_ultima_actualizacion": "2024-01-15T14:30:00Z"
+    }
+  },
+  {
+    "model": "inventarios.inventario",
+    "pk": 3,
+    "fields": {
+      "id_producto": 3,
+      "cantidad_actual": 100,
+      "ubicacion": "Estante C1",
+      "fecha_ultima_actualizacion": "2024-01-15T14:30:00Z"
+    }
+  },
+  {
+    "model": "inventarios.inventario",
+    "pk": 4,
+    "fields": {
+      "id_producto": 4,
+      "cantidad_actual": 60,
+      "ubicacion": "Estante A2",
+      "fecha_ultima_actualizacion": "2024-01-15T14:30:00Z"
+    }
+  },
+  {
+    "model": "inventarios.inventario",
+    "pk": 5,
+    "fields": {
+      "id_producto": 5,
+      "cantidad_actual": 30,
+      "ubicacion": "Estante B1",
+      "fecha_ultima_actualizacion": "2024-01-15T14:30:00Z"
+    }
+  },
+  {
+    "model": "inventarios.inventario",
+    "pk": 6,
+    "fields": {
+      "id_producto": 1,
+      "cantidad_actual": 25,
+      "ubicacion": "Bodega Principal",
+      "fecha_ultima_actualizacion": "2024-01-15T14:30:00Z"
+    }
+  },
+  {
+    "model": "inventarios.inventario",
+    "pk": 7,
+    "fields": {
+      "id_producto": 2,
+      "cantidad_actual": 40,
+      "ubicacion": "Bodega Principal",
+      "fecha_ultima_actualizacion": "2024-01-15T14:30:00Z"
+    }
+  }
+]
