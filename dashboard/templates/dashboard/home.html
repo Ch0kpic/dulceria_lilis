@@ -1,0 +1,74 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Dashboard - Dulcería Lilis{% endblock %}
+
+{% block content %}
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-number">{{ productos_count }}</div>
+        <div class="stat-label">📦 Productos</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">{{ inventarios_count }}</div>
+        <div class="stat-label">📋 Inventarios</div>
+    </div>
+    {% if user.is_superuser or user.id_rol.nombre == 'Administrador' %}
+    <div class="stat-card">
+        <div class="stat-number">{{ proveedores_count }}</div>
+        <div class="stat-label">🏢 Proveedores</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">{{ ventas_count }}</div>
+        <div class="stat-label">💰 Ventas</div>
+    </div>
+    {% endif %}
+</div>
+
+<nav class="nav-tabs">
+    <a href="{% url 'dashboard:productos' %}" class="nav-tab active">
+        📦 Productos
+    </a>
+    <a href="{% url 'dashboard:inventarios' %}" class="nav-tab">
+        📋 Inventarios
+    </a>
+    {% if user.is_superuser or user.id_rol.nombre == 'Administrador' %}
+    <a href="{% url 'dashboard:proveedores' %}" class="nav-tab">
+        🏢 Proveedores
+    </a>
+    <a href="{% url 'dashboard:ventas' %}" class="nav-tab">
+        💰 Ventas
+    </a>
+    {% endif %}
+</nav>
+
+<div class="card">
+    <div class="card-title">
+        <span class="icon">📊</span>
+        Resumen del Sistema
+    </div>
+    
+    {% if user.is_superuser or user.id_rol.nombre == 'Administrador' %}
+    <div class="alert alert-info">
+        <strong>Administrador:</strong> Tienes acceso completo a todas las funcionalidades del sistema.
+    </div>
+    {% elif user.id_rol.nombre == 'Bodeguero' %}
+    <div class="alert alert-info">
+        <strong>Bodeguero:</strong> Puedes gestionar productos e inventarios. Acceso limitado a otras secciones.
+    </div>
+    {% endif %}
+
+    <p>Bienvenido al sistema de gestión de Dulcería Lilis. Desde aquí puedes acceder a todas las funcionalidades disponibles según tu rol.</p>
+    
+    <div style="margin-top: 1rem;">
+        <h3>Funcionalidades disponibles:</h3>
+        <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+            <li><strong>Productos:</strong> Gestionar el catálogo de productos</li>
+            <li><strong>Inventarios:</strong> Controlar el stock y ubicaciones</li>
+            {% if user.is_superuser or user.id_rol.nombre == 'Administrador' %}
+            <li><strong>Proveedores:</strong> Administrar información de proveedores</li>
+            <li><strong>Ventas:</strong> Consultar reportes de ventas</li>
+            {% endif %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

@@ -14,6 +14,14 @@ class InventarioAdmin(admin.ModelAdmin):
     ordering = ('-fecha_ultima_actualizacion',)
     list_select_related = ('id_producto',)
     
+    def has_module_permission(self, request):
+        """Controlar acceso al módulo de inventarios"""
+        if hasattr(request.user, 'id_rol'):
+            user_role = request.user.id_rol.nombre
+            # Solo administradores pueden ver inventarios
+            return user_role == 'Administrador'
+        return request.user.is_superuser
+    
     fieldsets = (
         ('Información del Inventario', {
             'fields': ('id_producto', 'cantidad_actual', 'ubicacion')

@@ -3,7 +3,7 @@ from django.db import models
 class Producto(models.Model):
     id_producto = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=150, verbose_name="Nombre del Producto")
-    descripcion = models.CharField(max_length=250, verbose_name="Descripción")
+    descripcion = models.CharField(max_length=191, verbose_name="Descripción")
     precio_referencia = models.IntegerField(verbose_name="Precio de Referencia")
     
     class Meta:

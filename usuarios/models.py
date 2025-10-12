@@ -5,16 +5,16 @@ from roles.models import Rol
 class Usuario(AbstractUser):
     id_usuario = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=150, verbose_name="Nombre")
-    correo = models.EmailField(unique=True, verbose_name="Correo Electrónico")
-    contrasena = models.CharField(max_length=250, verbose_name="Contraseña")
+    correo = models.EmailField(max_length=191, unique=True, verbose_name="Correo Electrónico")
+    contrasena = models.CharField(max_length=128, verbose_name="Contraseña")
     id_rol = models.ForeignKey(Rol, on_delete=models.CASCADE, verbose_name="Rol")
     
     # Campos adicionales para AbstractUser
     username = models.CharField(max_length=150, unique=True)
     email = models.EmailField(blank=True)
     
-    USERNAME_FIELD = 'correo'
-    REQUIRED_FIELDS = ['username', 'nombre']
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['correo', 'nombre']
     
     class Meta:
         verbose_name = "Usuario"

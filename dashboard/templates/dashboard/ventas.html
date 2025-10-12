@@ -1,0 +1,77 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Ventas - Dulcería Lilis{% endblock %}
+
+{% block content %}
+<nav class="nav-tabs">
+    <a href="{% url 'dashboard:home' %}" class="nav-tab">
+        🏠 Dashboard
+    </a>
+    <a href="{% url 'dashboard:productos' %}" class="nav-tab">
+        📦 Productos
+    </a>
+    <a href="{% url 'dashboard:inventarios' %}" class="nav-tab">
+        📋 Inventarios
+    </a>
+    <a href="{% url 'dashboard:proveedores' %}" class="nav-tab">
+        🏢 Proveedores
+    </a>
+    <a href="{% url 'dashboard:ventas' %}" class="nav-tab active">
+        💰 Ventas
+    </a>
+</nav>
+
+<div class="card">
+    <div class="card-title">
+        <span class="icon">💰</span>
+        Reporte de Ventas
+    </div>
+    
+    <div class="alert alert-info">
+        <strong>Información:</strong> Esta sección muestra datos ficticios de ventas para demostración.
+    </div>
+
+    <div style="margin-bottom: 1rem;">
+        <span style="color: #999; font-size: 0.9rem;">Funcionalidad en desarrollo</span>
+    </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID Venta</th>
+                <th>Fecha</th>
+                <th>Cliente</th>
+                <th>Total</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for venta in ventas %}
+            <tr>
+                <td>#{{ venta.id }}</td>
+                <td>{{ venta.fecha }}</td>
+                <td><strong>{{ venta.cliente }}</strong></td>
+                <td>${{ venta.total|floatformat:0 }}</td>
+                <td>
+                    {% if venta.estado == 'Completada' %}
+                    <span style="background: #28a745; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem;">
+                        {{ venta.estado }}
+                    </span>
+                    {% else %}
+                    <span style="background: #ffc107; color: #212529; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem;">
+                        {{ venta.estado }}
+                    </span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="text-align: center; color: #999; padding: 2rem;">
+                    No hay ventas registradas
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
