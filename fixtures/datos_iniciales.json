@@ -35,7 +35,7 @@
     "model": "usuarios.usuario",
     "pk": 1,
     "fields": {
-      "password": "pbkdf2_sha256$600000$admin$example",
+      "password": "pbkdf2_sha256$1000000$FM1l7naMAsAhVdcmmrSqpB$ltYEsKhFiSMP8vCYZlEbzkkGzEDx86up+eJYWIlrYL8=",
       "last_login": null,
       "is_superuser": true,
       "username": "admin",
@@ -57,7 +57,7 @@
     "model": "usuarios.usuario",
     "pk": 2,
     "fields": {
-      "password": "pbkdf2_sha256$600000$test$example",
+      "password": "pbkdf2_sha256$1000000$SzqrQ3H9bODsxHK2g4IG1K$b5rddZX1LG8jBZwMDC2Y/D/cNhjHDFTNV4ceF7EqIM4=",
       "last_login": null,
       "is_superuser": false,
       "username": "vendedor1",
@@ -79,7 +79,7 @@
     "model": "usuarios.usuario",
     "pk": 3,
     "fields": {
-      "password": "pbkdf2_sha256$600000$test$example",
+      "password": "pbkdf2_sha256$1000000$rWybHPYm8Fy3td1iU96lZr$sR4RvtHDi2sS7BiOeLo3hdIPl4bwdO9dObEkM89abRs=",
       "last_login": null,
       "is_superuser": false,
       "username": "bodeguero1",
@@ -99,31 +99,9 @@
   },
   {
     "model": "usuarios.usuario",
-    "pk": 5,
-    "fields": {
-      "password": "pbkdf2_sha256$600000$bodeguero$example",
-      "last_login": null,
-      "is_superuser": false,
-      "username": "bodeguero",
-      "first_name": "",
-      "last_name": "",
-      "email": "bodeguero@dulceria.com",
-      "is_staff": true,
-      "is_active": true,
-      "date_joined": "2024-01-01T10:00:00Z",
-      "nombre": "María Bodeguera",
-      "correo": "bodeguero@dulceria.com",
-      "contrasena": "admin123",
-      "id_rol": 3,
-      "groups": [],
-      "user_permissions": []
-    }
-  },
-  {
-    "model": "usuarios.usuario",
     "pk": 4,
     "fields": {
-      "password": "pbkdf2_sha256$600000$test$example",
+      "password": "pbkdf2_sha256$1000000$DNMqgHTIfWylKKeSraSAXS$Z1A0LwLRvTvjUmmuoJ5fixZ5v7mC55X3mAYsCkSb+CY=",
       "last_login": null,
       "is_superuser": false,
       "username": "cliente1",
@@ -137,6 +115,28 @@
       "correo": "cliente1@dulceria.com",
       "contrasena": "cliente123",
       "id_rol": 4,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "usuarios.usuario",
+    "pk": 5,
+    "fields": {
+      "password": "pbkdf2_sha256$1000000$rWybHPYm8Fy3td1iU96lZr$sR4RvtHDi2sS7BiOeLo3hdIPl4bwdO9dObEkM89abRs=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "bodeguero",
+      "first_name": "",
+      "last_name": "",
+      "email": "bodeguero@dulceria.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2024-01-01T10:00:00Z",
+      "nombre": "María Bodeguera",
+      "correo": "bodeguero@dulceria.com",
+      "contrasena": "admin123",
+      "id_rol": 3,
       "groups": [],
       "user_permissions": []
     }
