@@ -43,6 +43,10 @@ INSTALLED_APPS = [
     'productos',
     'inventarios',
     'dashboard',
+    'ventas',
+    'detalle_ventas',
+    'proveedores',
+    'producto_proveedor',
 ]
 
 MIDDLEWARE = [
