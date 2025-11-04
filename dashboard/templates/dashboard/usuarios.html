@@ -1,0 +1,455 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Gestión de Usuarios - Dulcería Lilis{% endblock %}
+
+{% block extra_css %}
+<style>
+    .user-actions .btn {
+        margin-right: 0.25rem;
+    }
+    
+    .table-responsive {
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: var(--shadow-md);
+    }
+    
+    .status-badge {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.6rem;
+        border-radius: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    
+    .modal-header {
+        background: linear-gradient(135deg, var(--lilis-blue) 0%, var(--lilis-blue-hover) 100%);
+        color: white;
+    }
+    
+    .form-floating label {
+        color: var(--lilis-gray-600);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="text-dark fw-bold mb-1">
+                <i class="bi bi-people-fill text-lilis-blue me-2"></i>
+                Gestión de Usuarios
+            </h2>
+            <p class="text-muted mb-0">Administra los usuarios del sistema y sus permisos</p>
+        </div>
+        <button class="btn btn-lilis-primary" data-bs-toggle="modal" data-bs-target="#userModal" onclick="openNewUserModal()">
+            <i class="bi bi-person-plus me-2"></i>
+            Nuevo Usuario
+        </button>
+    </div>
+    
+    <!-- Alert Container -->
+    <div class="alert-container mb-3"></div>
+    
+    <!-- Filters Card -->
+    <div class="lilis-card mb-4">
+        <div class="lilis-card-body">
+            <h5 class="card-title mb-3">
+                <i class="bi bi-funnel me-2"></i>
+                Filtros de búsqueda
+            </h5>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="lilis-form-label">Buscar por nombre:</label>
+                    <input type="text" class="lilis-form-control" id="searchName" placeholder="Nombre del usuario">
+                </div>
+                <div class="col-md-3">
+                    <label class="lilis-form-label">Rol:</label>
+                    <select class="lilis-form-control" id="filterRole">
+                        <option value="">Todos</option>
+                        <option value="ADMIN">Administrador</option>
+                        <option value="AUDITOR">Auditor</option>
+                        <option value="OPERADOR">Operador</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="lilis-form-label">Estado:</label>
+                    <select class="lilis-form-control" id="filterStatus">
+                        <option value="">Todos</option>
+                        <option value="ACTIVO">Activo</option>
+                        <option value="BLOQUEADO">Bloqueado</option>
+                        <option value="INACTIVO">Inactivo</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button class="btn btn-lilis-secondary w-100" onclick="clearFilters()">
+                        <i class="bi bi-arrow-clockwise me-1"></i>
+                        Limpiar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Users Table -->
+    <div class="lilis-card">
+        <div class="lilis-card-header d-flex justify-content-between align-items-center">
+            <h5 class="lilis-card-title mb-0">
+                <i class="bi bi-table me-2"></i>
+                Lista de Usuarios
+            </h5>
+            <div class="d-flex align-items-center">
+                <span class="badge bg-secondary me-3" id="userCount">{{ users.count }} usuarios</span>
+                <button class="btn btn-outline-success btn-sm" onclick="exportToExcel()">
+                    <i class="bi bi-file-excel me-1"></i>
+                    Exportar a Excel
+                </button>
+            </div>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="table table-hover mb-0" id="usersTable">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">Usuario</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Apellido</th>
+                        <th scope="col">Teléfono</th>
+                        <th scope="col">Rol</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Última Sesión</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr data-user-id="{{ user.id }}">
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-circle me-2" style="width: 32px; height: 32px; background: var(--lilis-blue-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--lilis-blue); font-weight: 600; font-size: 0.8rem;">
+                                    {{ user.nombre.0 }}{{ user.apellido.0 }}
+                                </div>
+                                <strong>{{ user.usuario }}</strong>
+                            </div>
+                        </td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.nombre }}</td>
+                        <td>{{ user.apellido }}</td>
+                        <td>{{ user.telefono|default:'-' }}</td>
+                        <td>
+                            <span class="lilis-badge lilis-badge-info">{{ user.id_rol.nombre }}</span>
+                        </td>
+                        <td>
+                            {% if user.activo %}
+                                <span class="lilis-badge lilis-badge-success">ACTIVO</span>
+                            {% else %}
+                                <span class="lilis-badge lilis-badge-danger">INACTIVO</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if user.last_login %}
+                                <small class="text-muted">{{ user.last_login|date:"d/m/Y H:i" }}</small>
+                            {% else %}
+                                <small class="text-muted">Nunca</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="user-actions">
+                                <button class="btn btn-outline-primary btn-sm" onclick="editUser('{{ user.id }}')" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                {% if user.activo %}
+                                    <button class="btn btn-outline-warning btn-sm" onclick="toggleUserStatus('{{ user.id }}', false)" title="Desactivar">
+                                        <i class="bi bi-pause-circle"></i>
+                                    </button>
+                                {% else %}
+                                    <button class="btn btn-outline-success btn-sm" onclick="toggleUserStatus('{{ user.id }}', true)" title="Activar">
+                                        <i class="bi bi-play-circle"></i>
+                                    </button>
+                                {% endif %}
+                                <button class="btn btn-lilis-danger btn-sm" onclick="deleteUser('{{ user.id }}')" title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="text-center py-4">
+                            <div class="text-muted">
+                                <i class="bi bi-people display-4 d-block mb-3" style="color: var(--lilis-gray-300);"></i>
+                                No se encontraron usuarios
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- User Modal -->
+<div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="userModalLabel">
+                    <i class="bi bi-person-plus me-2"></i>
+                    Nuevo Usuario
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="userForm" method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" id="userId" name="user_id">
+                    
+                    <!-- Identificación y credenciales -->
+                    <h6 class="text-primary fw-bold mb-3">
+                        <i class="bi bi-person-badge me-2"></i>
+                        Identificación y credenciales
+                    </h6>
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="usuario" name="usuario" placeholder="Usuario" required>
+                                <label for="usuario">Usuario <span class="text-danger">*</span></label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
+                                <label for="email">Email <span class="text-danger">*</span></label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="password" class="form-control" id="password" name="password" placeholder="Contraseña">
+                                <label for="password">Contraseña <span class="text-danger" id="passwordRequired">*</span></label>
+                                <div class="form-text">Dejar vacío para mantener la contraseña actual</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="id_rol" name="id_rol" required>
+                                    <option value="">Seleccionar rol</option>
+                                    {% for rol in roles %}
+                                    <option value="{{ rol.id }}">{{ rol.nombre }}</option>
+                                    {% endfor %}
+                                </select>
+                                <label for="id_rol">Rol <span class="text-danger">*</span></label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Datos personales -->
+                    <h6 class="text-primary fw-bold mb-3">
+                        <i class="bi bi-person me-2"></i>
+                        Datos personales
+                    </h6>
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Nombre" required>
+                                <label for="nombre">Nombre <span class="text-danger">*</span></label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="apellido" name="apellido" placeholder="Apellido" required>
+                                <label for="apellido">Apellido <span class="text-danger">*</span></label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="tel" class="form-control" id="telefono" name="telefono" placeholder="Teléfono">
+                                <label for="telefono">Teléfono</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="direccion" name="direccion" placeholder="Dirección">
+                                <label for="direccion">Dirección</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Estado y accesos -->
+                    <h6 class="text-primary fw-bold mb-3">
+                        <i class="bi bi-gear me-2"></i>
+                        Estado y accesos
+                    </h6>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="activo" name="activo" checked>
+                                <label class="form-check-label" for="activo">
+                                    Usuario activo
+                                </label>
+                            </div>
+                            <small class="text-muted">Los usuarios inactivos no pueden iniciar sesión</small>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="cambiar_password" name="cambiar_password">
+                                <label class="form-check-label" for="cambiar_password">
+                                    Forzar cambio de contraseña
+                                </label>
+                            </div>
+                            <small class="text-muted">El usuario deberá cambiar su contraseña en el próximo inicio de sesión</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-lilis-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-1"></i>
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-lilis-primary">
+                        <i class="bi bi-check-circle me-1"></i>
+                        <span id="submitButtonText">Crear Usuario</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let isEditMode = false;
+    
+    // Modal Functions
+    function openNewUserModal() {
+        isEditMode = false;
+        document.getElementById('userModalLabel').innerHTML = '<i class="bi bi-person-plus me-2"></i>Nuevo Usuario';
+        document.getElementById('submitButtonText').textContent = 'Crear Usuario';
+        document.getElementById('passwordRequired').style.display = 'inline';
+        document.getElementById('password').required = true;
+        document.getElementById('userForm').reset();
+        document.getElementById('userId').value = '';
+        document.getElementById('activo').checked = true;
+    }
+    
+    function editUser(userId) {
+        isEditMode = true;
+        document.getElementById('userModalLabel').innerHTML = '<i class="bi bi-pencil me-2"></i>Editar Usuario';
+        document.getElementById('submitButtonText').textContent = 'Actualizar Usuario';
+        document.getElementById('passwordRequired').style.display = 'none';
+        document.getElementById('password').required = false;
+        
+        // Aquí cargarías los datos del usuario via AJAX
+        // Por ahora simulamos la carga
+        loadUserData(userId);
+        
+        new bootstrap.Modal(document.getElementById('userModal')).show();
+    }
+    
+    function loadUserData(userId) {
+        // Simulación de carga de datos - integrar con backend
+        document.getElementById('userId').value = userId;
+        // Llenar los campos del formulario con los datos del usuario
+    }
+    
+    // CRUD Operations
+    function deleteUser(userId) {
+        if (confirm('¿Estás seguro de que deseas eliminar este usuario?\n\nEsta acción no se puede deshacer.')) {
+            // Implementar eliminación via AJAX
+            console.log('Eliminando usuario:', userId);
+            LilisSystem.showAlert('Usuario eliminado correctamente', 'success');
+        }
+    }
+    
+    function toggleUserStatus(userId, activate) {
+        const action = activate ? 'activar' : 'desactivar';
+        if (confirm(`¿Estás seguro de que deseas ${action} este usuario?`)) {
+            // Implementar cambio de estado via AJAX
+            console.log(`${action} usuario:`, userId);
+            LilisSystem.showAlert(`Usuario ${action}do correctamente`, 'success');
+            // Recargar la página o actualizar la fila
+            location.reload();
+        }
+    }
+    
+    // Search and Filter Functions
+    function clearFilters() {
+        document.getElementById('searchName').value = '';
+        document.getElementById('filterRole').value = '';
+        document.getElementById('filterStatus').value = '';
+        filterTable();
+    }
+    
+    function filterTable() {
+        const searchName = document.getElementById('searchName').value.toLowerCase();
+        const filterRole = document.getElementById('filterRole').value;
+        const filterStatus = document.getElementById('filterStatus').value;
+        
+        const rows = document.querySelectorAll('#usersTable tbody tr');
+        let visibleCount = 0;
+        
+        rows.forEach(row => {
+            if (row.cells.length === 1) return; // Skip empty row
+            
+            const name = row.cells[2].textContent.toLowerCase() + ' ' + row.cells[3].textContent.toLowerCase();
+            const role = row.cells[5].textContent.trim();
+            const status = row.cells[6].textContent.trim();
+            
+            const matchName = !searchName || name.includes(searchName);
+            const matchRole = !filterRole || role === filterRole;
+            const matchStatus = !filterStatus || status === filterStatus;
+            
+            if (matchName && matchRole && matchStatus) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        
+        document.getElementById('userCount').textContent = `${visibleCount} usuarios`;
+    }
+    
+    // Export function
+    function exportToExcel() {
+        // Implementar exportación
+        LilisSystem.showAlert('Exportando datos a Excel...', 'info');
+    }
+    
+    // Form submission
+    document.getElementById('userForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const action = isEditMode ? 'actualizado' : 'creado';
+        
+        // Aquí enviarías los datos via AJAX
+        console.log('Guardando usuario...');
+        
+        // Simular éxito
+        setTimeout(() => {
+            bootstrap.Modal.getInstance(document.getElementById('userModal')).hide();
+            LilisSystem.showAlert(`Usuario ${action} correctamente`, 'success');
+        }, 500);
+    });
+    
+    // Event listeners for filters
+    document.getElementById('searchName').addEventListener('input', filterTable);
+    document.getElementById('filterRole').addEventListener('change', filterTable);
+    document.getElementById('filterStatus').addEventListener('change', filterTable);
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Usuario management loaded');
+    });
+</script>
+{% endblock %}

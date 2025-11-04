@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.contrib import messages
 from django.http import JsonResponse
+from django.utils import timezone
 from productos.models import Producto
 from inventarios.models import Inventario
 from .forms import ProductoForm, InventarioForm
@@ -25,7 +26,7 @@ def login_view(request):
         else:
             messages.error(request, 'Usuario o contraseña incorrectos')
     
-    return render(request, 'dashboard/login.html')
+    return render(request, 'dashboard/new_login.html')
 
 def logout_view(request):
     """Vista de logout"""
@@ -36,12 +37,15 @@ def logout_view(request):
 def home(request):
     """Dashboard principal"""
     user = request.user
+    now = timezone.now()
     
     # Datos para el contexto
     context = {
         'user': user,
         'productos_count': Producto.objects.count(),
         'inventarios_count': Inventario.objects.count(),
+        'today': now.date(),
+        'now': now,
     }
     
     # Datos ficticios para proveedores y ventas (solo para administradores)
@@ -57,8 +61,27 @@ def home(request):
 def productos_view(request):
     """Vista de productos"""
     productos = Producto.objects.all().order_by('nombre')
+    
+    # Mock categories for filter
+    class MockCategoria:
+        def __init__(self, id, nombre):
+            self.id = id
+            self.nombre = nombre
+    
+    categorias = [
+        MockCategoria(1, 'Chocolates'),
+        MockCategoria(2, 'Caramelos'),
+        MockCategoria(3, 'Galletas'),
+        MockCategoria(4, 'Dulces'),
+    ]
+    
     context = {
         'productos': productos,
+        'categorias': categorias,
+        'productos_count': productos.count(),
+        'productos_activos': productos.count(),  # Assumiendo todos activos
+        'productos_stock_bajo': 0,  # Mock data
+        'productos_vencidos': 0,    # Mock data
         'user': request.user,
     }
     return render(request, 'dashboard/productos.html', context)
@@ -67,8 +90,28 @@ def productos_view(request):
 def inventarios_view(request):
     """Vista de inventarios"""
     inventarios = Inventario.objects.select_related('id_producto').all()
+    now = timezone.now()
+    
+    # Mock data para proveedores
+    class MockProveedor:
+        def __init__(self, id_proveedor, nombre):
+            self.id_proveedor = id_proveedor
+            self.nombre = nombre
+    
+    proveedores = [
+        MockProveedor(1, 'Distribuidora Nacional'),
+        MockProveedor(2, 'Dulces Premium SAC'),
+        MockProveedor(3, 'Confitería del Norte'),
+    ]
+    
     context = {
         'inventarios': inventarios,
+        'proveedores': proveedores,
+        'total_productos': inventarios.count(),
+        'stock_alto': 0,  # Calcular basado en lógica de stock
+        'stock_medio': 0,
+        'stock_bajo': 0,
+        'today': now.date(),
         'user': request.user,
     }
     return render(request, 'dashboard/inventarios.html', context)
@@ -82,15 +125,31 @@ def proveedores_view(request):
     if not (user.is_superuser or (hasattr(user, 'id_rol') and user.id_rol.nombre == 'Administrador')):
         raise PermissionDenied("No tienes permisos para acceder a esta sección")
     
-    # Datos ficticios
+    # Datos ficticios para proveedores
+    class MockProveedor:
+        def __init__(self, id_proveedor, nombre, contacto, telefono, email):
+            self.id_proveedor = id_proveedor
+            self.nombre = nombre
+            self.contacto = contacto
+            self.telefono = telefono
+            self.email = email
+    
     proveedores = [
-        {'id': 1, 'nombre': 'Proveedor A', 'contacto': 'contacto@proveedora.com', 'telefono': '123-456-7890'},
-        {'id': 2, 'nombre': 'Proveedor B', 'contacto': 'contacto@proveedorb.com', 'telefono': '098-765-4321'},
-        {'id': 3, 'nombre': 'Proveedor C', 'contacto': 'contacto@proveedorc.com', 'telefono': '555-123-4567'},
+        MockProveedor(1, 'Distribuidora Nacional', 'Juan Pérez', '123-456-7890', 'contacto@distrinacional.com'),
+        MockProveedor(2, 'Dulces Premium SAC', 'María García', '098-765-4321', 'ventas@dulcespremium.com'),
+        MockProveedor(3, 'Confitería del Norte', 'Carlos López', '555-123-4567', 'info@confiterianorte.com'),
     ]
+    
+    # Productos disponibles para asociar con proveedores
+    productos_disponibles = Producto.objects.all()
     
     context = {
         'proveedores': proveedores,
+        'productos_disponibles': productos_disponibles,
+        'proveedores_count': len(proveedores),
+        'proveedores_activos': len(proveedores),
+        'productos_proveedor': productos_disponibles.count(),
+        'ordenes_pendientes': 0,
         'user': request.user,
     }
     return render(request, 'dashboard/proveedores.html', context)
@@ -226,3 +285,54 @@ def editar_inventario(request, inventario_id):
         'inventario': inventario
     }
     return render(request, 'dashboard/form_inventario.html', context)
+
+def forgot_password_view(request):
+    """Vista para recuperación de contraseña"""
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        # Aquí implementarías la lógica de envío de email
+        messages.success(request, 'Se han enviado las instrucciones de recuperación a tu email')
+        return redirect('dashboard:login')
+    
+    return render(request, 'dashboard/forgot_password.html')
+
+def reset_password_view(request):
+    """Vista para resetear contraseña"""
+    if request.method == 'POST':
+        password = request.POST.get('password')
+        password_confirm = request.POST.get('password_confirm')
+        
+        if password == password_confirm:
+            # Aquí implementarías la lógica de cambio de contraseña
+            messages.success(request, 'Contraseña cambiada exitosamente')
+            return redirect('dashboard:login')
+        else:
+            messages.error(request, 'Las contraseñas no coinciden')
+    
+    return render(request, 'dashboard/reset_password.html')
+
+@login_required
+def usuarios_view(request):
+    """Vista de gestión de usuarios"""
+    user = request.user
+    
+    # Solo administradores pueden gestionar usuarios
+    if not (user.is_superuser or (hasattr(user, 'id_rol') and user.id_rol.nombre == 'Administrador')):
+        raise PermissionDenied("No tienes permisos para gestionar usuarios")
+    
+    # Usar el modelo de Usuario personalizado
+    from usuarios.models import Usuario
+    from roles.models import Rol
+    usuarios = Usuario.objects.select_related('id_rol').all()
+    roles = Rol.objects.all()
+    
+    context = {
+        'usuarios': usuarios,
+        'roles': roles,
+        'usuarios_count': usuarios.count(),
+        'usuarios_activos': usuarios.filter(is_active=True).count(),
+        'usuarios_inactivos': usuarios.filter(is_active=False).count(),
+        'nuevos_usuarios': 0,  # Mock data
+        'user': request.user,
+    }
+    return render(request, 'dashboard/usuarios.html', context)

@@ -1,112 +1,343 @@
 {% extends 'dashboard/base.html' %}
+{% load static %}
 
-{% block title %}Productos - Dulcería Lilis{% endblock %}
+{% block title %}Gestión de Productos - Dulcería Lilis{% endblock %}
+
+{% block extra_css %}
+<style>
+    .product-actions .btn {
+        margin-right: 0.25rem;
+    }
+    
+    .product-image {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        object-fit: cover;
+        background: var(--lilis-gray-200);
+    }
+    
+    .stock-indicator {
+        width: 100%;
+        height: 4px;
+        background: var(--lilis-gray-200);
+        border-radius: 2px;
+        overflow: hidden;
+    }
+    
+    .stock-fill {
+        height: 100%;
+        transition: width 0.3s ease;
+    }
+    
+    .stock-low { background: var(--lilis-red); }
+    .stock-medium { background: var(--lilis-yellow); }
+    .stock-good { background: var(--lilis-green); }
+</style>
+{% endblock %}
 
 {% block content %}
-<nav class="nav-tabs">
-    <a href="{% url 'dashboard:home' %}" class="nav-tab">
-        🏠 Dashboard
-    </a>
-    <a href="{% url 'dashboard:productos' %}" class="nav-tab active">
-        📦 Productos
-    </a>
-    <a href="{% url 'dashboard:inventarios' %}" class="nav-tab">
-        📋 Inventarios
-    </a>
-    {% if user.is_superuser or user.id_rol.nombre == 'Administrador' %}
-    <a href="{% url 'dashboard:proveedores' %}" class="nav-tab">
-        🏢 Proveedores
-    </a>
-    <a href="{% url 'dashboard:ventas' %}" class="nav-tab">
-        💰 Ventas
-    </a>
-    {% endif %}
-</nav>
-
-<div class="card">
-    <div class="card-title">
-        <span class="icon">📦</span>
-        Gestión de Productos
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="text-dark fw-bold mb-1">
+                <i class="bi bi-box-seam-fill text-lilis-blue me-2"></i>
+                Gestión de Productos
+            </h2>
+            <p class="text-muted mb-0">Administra el catálogo de productos de la dulcería</p>
+        </div>
+        <button class="btn btn-lilis-primary" onclick="openProductForm()">
+            <i class="bi bi-plus-circle me-2"></i>
+            Nuevo Producto
+        </button>
     </div>
     
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
-                {{ message }}
+    <!-- Stats Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="lilis-card">
+                <div class="lilis-card-body text-center">
+                    <div class="fs-2 fw-bold text-lilis-blue mb-1">{{ productos_count|default:0 }}</div>
+                    <div class="text-muted">
+                        <i class="bi bi-box-seam me-1"></i>
+                        Total Productos
+                    </div>
+                </div>
             </div>
-        {% endfor %}
-    {% endif %}
-
-    {% if user.id_rol.nombre == 'Bodeguero' %}
-    <div class="alert alert-info">
-        <strong>Permisos de Bodeguero:</strong> Puedes ver todos los productos y agregar nuevos. No puedes modificar productos existentes.
+        </div>
+        <div class="col-md-3">
+            <div class="lilis-card">
+                <div class="lilis-card-body text-center">
+                    <div class="fs-2 fw-bold text-lilis-green mb-1">{{ productos_activos|default:0 }}</div>
+                    <div class="text-muted">
+                        <i class="bi bi-check-circle me-1"></i>
+                        Activos
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="lilis-card">
+                <div class="lilis-card-body text-center">
+                    <div class="fs-2 fw-bold text-lilis-yellow mb-1">{{ productos_stock_bajo|default:0 }}</div>
+                    <div class="text-muted">
+                        <i class="bi bi-exclamation-triangle me-1"></i>
+                        Stock Bajo
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="lilis-card">
+                <div class="lilis-card-body text-center">
+                    <div class="fs-2 fw-bold text-lilis-red mb-1">{{ productos_vencidos|default:0 }}</div>
+                    <div class="text-muted">
+                        <i class="bi bi-calendar-x me-1"></i>
+                        Por Vencer
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    {% endif %}
-
-    <div style="margin-bottom: 1rem;">
-        <a href="{% url 'dashboard:agregar_producto' %}" class="btn btn-primary">➕ Agregar Nuevo Producto</a>
-    </div>
-
-    <table class="table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Descripción</th>
-                <th>Precio Referencia</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for producto in productos %}
-            <tr>
-                <td>{{ producto.id_producto }}</td>
-                <td><strong>{{ producto.nombre }}</strong></td>
-                <td>{{ producto.descripcion }}</td>
-                <td>${{ producto.precio_referencia|floatformat:0 }}</td>
-                <td>
-                    {% if user.is_superuser or user.id_rol.nombre == 'Administrador' %}
-                    <a href="{% url 'dashboard:editar_producto' producto.id_producto %}" class="btn btn-secondary">✏️ Editar</a>
-                    {% else %}
-                    <span style="color: #999; font-size: 0.9rem;">Solo lectura</span>
-                    {% endif %}
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="5" style="text-align: center; color: #999; padding: 2rem;">
-                    No hay productos registrados
-                </td>
-            </tr>
+    
+    <!-- Alert Container -->
+    <div class="alert-container mb-3">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="lilis-alert lilis-alert-{{ message.tags|default:'info' }}">
+                    {{ message }}
+                </div>
             {% endfor %}
-        </tbody>
-    </table>
+        {% endif %}
+    </div>
+    
+    <!-- Filters Card -->
+    <div class="lilis-card mb-4">
+        <div class="lilis-card-body">
+            <h5 class="card-title mb-3">
+                <i class="bi bi-funnel me-2"></i>
+                Buscar productos
+            </h5>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <input type="text" class="lilis-form-control" id="searchProduct" placeholder="Buscar por SKU o nombre...">
+                </div>
+                <div class="col-md-2">
+                    <select class="lilis-form-control" id="filterCategory">
+                        <option value="">Todas las categorías</option>
+                        {% for categoria in categorias %}
+                        <option value="{{ categoria.id }}">{{ categoria.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="lilis-form-control" id="filterStatus">
+                        <option value="">Todos los estados</option>
+                        <option value="activo">Activo</option>
+                        <option value="inactivo">Inactivo</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="lilis-form-control" id="filterStock">
+                        <option value="">Todo el stock</option>
+                        <option value="bajo">Stock bajo</option>
+                        <option value="normal">Stock normal</option>
+                        <option value="alto">Stock alto</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-outline-success w-100" onclick="exportToExcel()">
+                        <i class="bi bi-file-excel me-1"></i>
+                        Exportar a Excel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Products Table -->
+    <div class="lilis-card">
+        <div class="lilis-card-header d-flex justify-content-between align-items-center">
+            <h5 class="lilis-card-title mb-0">
+                <i class="bi bi-list me-2"></i>
+                Lista de Productos
+            </h5>
+            <span class="badge bg-secondary" id="productCount">{{ productos.count|default:0 }} productos</span>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="table table-hover mb-0" id="productsTable">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">SKU</th>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Stock</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for producto in productos %}
+                    <tr data-product-id="{{ producto.id_producto }}">
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="product-image me-2 d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-box text-muted"></i>
+                                </div>
+                                <div>
+                                    <strong>SKU-{{ producto.id_producto|stringformat:"04d" }}</strong>
+                                    <div class="small text-muted">Producto ID: {{ producto.id_producto }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                <strong>{{ producto.nombre }}</strong>
+                                <div class="small text-muted">{{ producto.descripcion|truncatechars:50 }}</div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="me-2">
+                                    <strong>N/A</strong>
+                                    <small class="text-muted">Ver inventario</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="product-actions">
+                                {% if user.is_superuser or user.id_rol.nombre == 'Administrador' %}
+                                    <a href="{% url 'dashboard:editar_producto' producto.id_producto %}" class="btn btn-outline-primary btn-sm" title="Editar">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                {% endif %}
+                                <button class="btn btn-outline-info btn-sm" onclick="viewProduct('{{ producto.id_producto }}')" title="Ver detalles">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center py-5">
+                            <div class="text-muted">
+                                <i class="bi bi-box-seam display-4 d-block mb-3" style="color: var(--lilis-gray-300);"></i>
+                                <p class="mb-3">No se encontraron productos</p>
+                                <button class="btn btn-lilis-primary" onclick="openProductForm()">
+                                    <i class="bi bi-plus-circle me-2"></i>
+                                    Crear primer producto
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
+{% endblock %}
 
-<style>
-.alert {
-    padding: 12px 16px;
-    border-radius: 8px;
-    margin-bottom: 1rem;
-    font-weight: 500;
-}
-
-.alert-success {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
-
-.alert-error {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
-
-.alert-info {
-    background-color: #d1ecf1;
-    color: #0c5460;
-    border: 1px solid #bee5eb;
-}
-</style>
+{% block extra_js %}
+<script>
+    // Product Management Functions
+    function openProductForm() {
+        // Redirigir al formulario de producto
+        window.location.href = "{% url 'dashboard:agregar_producto' %}";
+    }
+    
+    function editProduct(productId) {
+        // Redirigir al formulario de edición
+        window.location.href = `/productos/editar/${productId}/`;
+    }
+    
+    function viewProduct(productId) {
+        LilisSystem.showAlert('Funcionalidad de vista detallada en desarrollo', 'info');
+    }
+    
+    function deleteProduct(productId) {
+        if (LilisSystem.confirmDelete('¿Estás seguro de que deseas eliminar este producto?\n\nEsta acción no se puede deshacer.')) {
+            // Implementar eliminación via AJAX
+            console.log('Eliminando producto:', productId);
+            LilisSystem.showAlert('Producto eliminado correctamente', 'success');
+            
+            // Remover fila de la tabla
+            const row = document.querySelector(`tr[data-product-id="${productId}"]`);
+            if (row) {
+                row.remove();
+                updateProductCount();
+            }
+        }
+    }
+    
+    // Filter and Search Functions
+    function filterProducts() {
+        const searchTerm = document.getElementById('searchProduct').value.toLowerCase();
+        const categoryFilter = document.getElementById('filterCategory').value;
+        const statusFilter = document.getElementById('filterStatus').value;
+        const stockFilter = document.getElementById('filterStock').value;
+        
+        const rows = document.querySelectorAll('#productsTable tbody tr');
+        let visibleCount = 0;
+        
+        rows.forEach(row => {
+            if (row.cells.length === 1) return; // Skip empty row
+            
+            const sku = row.cells[0].textContent.toLowerCase();
+            const name = row.cells[1].textContent.toLowerCase();
+            const visible = (!searchTerm || sku.includes(searchTerm) || name.includes(searchTerm));
+            
+            if (visible) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        
+        updateProductCount(visibleCount);
+    }
+    
+    function updateProductCount(count = null) {
+        const counter = document.getElementById('productCount');
+        if (count !== null) {
+            counter.textContent = `${count} productos`;
+        } else {
+            const visibleRows = document.querySelectorAll('#productsTable tbody tr:not([style*="display: none"])');
+            const emptyRowExists = visibleRows.length > 0 && visibleRows[0].cells.length === 1;
+            const actualCount = emptyRowExists ? 0 : visibleRows.length;
+            counter.textContent = `${actualCount} productos`;
+        }
+    }
+    
+    function exportToExcel() {
+        LilisSystem.showAlert('Exportando productos a Excel...', 'info');
+        // Implementar exportación
+    }
+    
+    // Event Listeners
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchProduct');
+        if (searchInput) {
+            searchInput.addEventListener('input', filterProducts);
+        }
+        
+        const filterCategory = document.getElementById('filterCategory');
+        if (filterCategory) {
+            filterCategory.addEventListener('change', filterProducts);
+        }
+        
+        const filterStatus = document.getElementById('filterStatus');
+        if (filterStatus) {
+            filterStatus.addEventListener('change', filterProducts);
+        }
+        
+        const filterStock = document.getElementById('filterStock');
+        if (filterStock) {
+            filterStock.addEventListener('change', filterProducts);
+        }
+        
+        console.log('Product management loaded');
+    });
+</script>
 {% endblock %}

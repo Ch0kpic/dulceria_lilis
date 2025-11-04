@@ -1,0 +1,696 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - Dulcería Lilis{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container {
+        background: white;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+    }
+    
+    .form-header {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-bottom: 1px solid #e9ecef;
+        border-radius: 8px 8px 0 0;
+    }
+    
+    .proveedores-list-container {
+        background: white;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+        max-height: 600px;
+    }
+    
+    .proveedores-list-header {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-bottom: 1px solid #e9ecef;
+        border-radius: 8px 8px 0 0;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+    
+    .proveedores-list-body {
+        max-height: 500px;
+        overflow-y: auto;
+    }
+    
+    .proveedor-item {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #f0f0f0;
+        display: flex;
+        justify-content: between;
+        align-items: center;
+    }
+    
+    .proveedor-item:last-child {
+        border-bottom: none;
+    }
+    
+    .proveedor-info {
+        flex-grow: 1;
+    }
+    
+    .proveedor-name {
+        font-weight: 600;
+        color: #333;
+        margin: 0;
+        font-size: 0.95rem;
+    }
+    
+    .proveedor-rut {
+        color: #666;
+        margin: 0;
+        font-size: 0.85rem;
+    }
+    
+    .proveedor-estado {
+        padding: 0.25rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        margin-right: 0.5rem;
+    }
+    
+    .estado-activo {
+        background: #e8f5e8;
+        color: #2e7d32;
+    }
+    
+    .estado-bloqueado {
+        background: #ffebee;
+        color: #d32f2f;
+    }
+    
+    .btn-actions {
+        display: flex;
+        gap: 0.25rem;
+    }
+    
+    .btn-action {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+        border-radius: 4px;
+        border: 1px solid;
+        background: white;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .btn-edit {
+        color: #1976d2;
+        border-color: #1976d2;
+    }
+    
+    .btn-edit:hover {
+        background: #1976d2;
+        color: white;
+    }
+    
+    .btn-delete {
+        color: #d32f2f;
+        border-color: #d32f2f;
+    }
+    
+    .btn-delete:hover {
+        background: #d32f2f;
+        color: white;
+    }
+    
+    .export-btn {
+        background: #4caf50;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        cursor: pointer;
+    }
+    
+    .form-field {
+        margin-bottom: 1rem;
+    }
+    
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #333;
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+    
+    .form-input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 0.9rem;
+    }
+    
+    .form-input:focus {
+        outline: none;
+        border-color: #1976d2;
+        box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+    }
+    
+    .form-select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        background: white;
+    }
+    
+    .btn-primary {
+        background: #1976d2;
+        color: white;
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        margin-right: 0.5rem;
+    }
+    
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        cursor: pointer;
+    }
+    
+    .search-container {
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .search-input {
+        flex-grow: 1;
+        padding: 0.5rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 0.85rem;
+    }
+    
+    /* Pasos del formulario */
+    .form-steps {
+        display: flex;
+        margin-bottom: 2rem;
+        background: #f8f9fa;
+        padding: 0.5rem;
+        border-radius: 8px;
+    }
+    
+    .step {
+        flex: 1;
+        text-align: center;
+        padding: 0.75rem;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .step.active {
+        background: #1976d2;
+        color: white;
+    }
+    
+    .step.completed {
+        background: #4caf50;
+        color: white;
+    }
+    
+    .step-content {
+        display: none;
+    }
+    
+    .step-content.active {
+        display: block;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <!-- Formulario de Proveedor (Lado Izquierdo) -->
+        <div class="col-md-6">
+            <div class="form-container">
+                <div class="form-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-truck me-2"></i>
+                        Formulario de Proveedor
+                    </h5>
+                </div>
+                
+                <div class="p-4">
+                    <!-- Alert Container -->
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <!-- Pasos del formulario -->
+                    <div class="form-steps">
+                        <div class="step active" id="step1" onclick="showStep(1)">
+                            1. Identificación y contacto
+                        </div>
+                        <div class="step" id="step2" onclick="showStep(2)">
+                            2. Dirección y comercial
+                        </div>
+                        <div class="step" id="step3" onclick="showStep(3)">
+                            3. Relación con productos
+                        </div>
+                    </div>
+
+                    <form method="post" id="proveedorForm">
+                        {% csrf_token %}
+                        
+                        <!-- Paso 1: Identificación y contacto -->
+                        <div class="step-content active" id="content-step1">
+                            <h6 class="mb-3 fw-bold">Identificación legal y contacto</h6>
+                            
+                            <div class="form-field">
+                                <label class="form-label">RUT <span class="text-muted">(opcional, pyme)</span></label>
+                                <input type="text" class="form-input" name="rut" placeholder="76.542.210-5">
+                            </div>
+
+                            <div class="form-field">
+                                <label class="form-label">razón_social <span class="text-muted">(requerida)</span></label>
+                                <input type="text" class="form-input" name="razon_social" placeholder="Proveedor S.A.">
+                            </div>
+
+                            <div class="form-field">
+                                <label class="form-label">nombre_fantasía <span class="text-muted">(opcional)</span></label>
+                                {{ form.nombre }}
+                                {% if form.nombre.errors %}
+                                    <div class="text-danger small mt-1">{{ form.nombre.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-field">
+                                        <label class="form-label">teléfono <span class="text-muted">(opcional)</span></label>
+                                        <input type="text" class="form-input" name="telefono" placeholder="+56 9 2345 6789">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-field">
+                                        <label class="form-label">sitio_web <span class="text-muted">(opcional)</span></label>
+                                        <input type="url" class="form-input" name="sitio_web" placeholder="https://proveedor.cl">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-field">
+                                <label class="form-label">email <span class="text-muted">(opcional)</span></label>
+                                <input type="email" class="form-input" name="email" placeholder="contacto@proveedor.cl">
+                            </div>
+
+                            <div class="form-field">
+                                <label class="form-label">contacto_fut_proveedor <span class="text-muted">(opcional)</span></label>
+                                {{ form.contacto }}
+                                {% if form.contacto.errors %}
+                                    <div class="text-danger small mt-1">{{ form.contacto.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Paso 2: Dirección y comercial -->
+                        <div class="step-content" id="content-step2">
+                            <h6 class="mb-3 fw-bold">Dirección y comercial</h6>
+                            
+                            <div class="form-field">
+                                <label class="form-label">Dirección <span class="text-danger">*</span></label>
+                                {{ form.direccion }}
+                                {% if form.direccion.errors %}
+                                    <div class="text-danger small mt-1">{{ form.direccion.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-field">
+                                        <label class="form-label">País <span class="text-muted">(opcional si es de Chile)</span></label>
+                                        <select class="form-select" name="pais">
+                                            <option value="Chile" selected>Chile</option>
+                                            <option value="Argentina">Argentina</option>
+                                            <option value="Perú">Perú</option>
+                                            <option value="Bolivia">Bolivia</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-field">
+                                        <label class="form-label">Región <span class="text-muted">(opcional si es RM)</span></label>
+                                        <select class="form-select" name="region">
+                                            <option value="Metropolitana" selected>Metropolitana</option>
+                                            <option value="Valparaíso">Valparaíso</option>
+                                            <option value="Biobío">Biobío</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-field">
+                                        <label class="form-label">Comuna <span class="text-muted">(opcional si es Santiago)</span></label>
+                                        <select class="form-select" name="comuna">
+                                            <option value="Santiago" selected>Santiago</option>
+                                            <option value="Las Condes">Las Condes</option>
+                                            <option value="Providencia">Providencia</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-field">
+                                        <label class="form-label">Condiciones pago <span class="text-muted">(requerido si distint 30 días)</span></label>
+                                        <select class="form-select" name="condiciones_pago">
+                                            <option value="30 días" selected>30 días</option>
+                                            <option value="15 días">15 días</option>
+                                            <option value="Al contado">Al contado</option>
+                                            <option value="60 días">60 días</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-field">
+                                        <label class="form-label">Descuento <span class="text-muted">(requerido si distint 0%)</span></label>
+                                        <input type="number" class="form-input" name="descuento" placeholder="0" value="0" min="0" max="100">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-field">
+                                <label class="form-label">Estado y acceso</label>
+                                {{ form.estado }}
+                            </div>
+                        </div>
+
+                        <!-- Paso 3: Relación con productos -->
+                        <div class="step-content" id="content-step3">
+                            <h6 class="mb-3 fw-bold">Relación con productos</h6>
+                            
+                            <p class="text-muted small mb-3">
+                                Las relaciones con productos se manejan desde el módulo de productos. 
+                                Aquí se muestran solo como referencia.
+                            </p>
+
+                            <div class="form-field">
+                                <label class="form-label">Productos asociados <span class="text-muted">(solo lectura)</span></label>
+                                <textarea class="form-input" name="productos_asociados" placeholder="No hay productos asociados aún" rows="3" readonly></textarea>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-field">
+                                        <label class="form-label">Total productos</label>
+                                        <input type="number" class="form-input" name="total_productos" placeholder="0" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-field">
+                                        <label class="form-label">Última compra</label>
+                                        <input type="text" class="form-input" name="ultima_compra" placeholder="Nunca" readonly>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-field">
+                                        <label class="form-label">Monto total</label>
+                                        <input type="text" class="form-input" name="monto_total" placeholder="$0" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-field">
+                                        <label class="form-label">Evaluación</label>
+                                        <input type="text" class="form-input" name="evaluacion" placeholder="Sin evaluar" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-field">
+                                        <label class="form-label">Prioridad</label>
+                                        <select class="form-select" name="prioridad">
+                                            <option value="Normal" selected>Normal</option>
+                                            <option value="Alta">Alta</option>
+                                            <option value="Baja">Baja</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Error general del formulario -->
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {{ form.non_field_errors }}
+                            </div>
+                        {% endif %}
+
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="submit" class="btn-primary">Guardar</button>
+                            <button type="button" class="btn-secondary" onclick="clearForm()">Limpiar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de Proveedores (Lado Derecho) -->
+        <div class="col-md-6">
+            <div class="proveedores-list-container">
+                <div class="proveedores-list-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Proveedores</h5>
+                    <button class="export-btn">
+                        <i class="bi bi-file-excel me-1"></i>
+                        Exportar a Excel
+                    </button>
+                </div>
+                
+                <div class="p-3">
+                    <div class="search-container">
+                        <input type="text" class="search-input" placeholder="Buscar por RUT/NIF o razón social...">
+                    </div>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>RUT/NIF</th>
+                                <th>Razón Social</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="proveedoresList">
+                            {% for proveedor in proveedores %}
+                            <tr data-proveedor-id="{{ proveedor.id_proveedor }}">
+                                <td class="small">{{ proveedor.rut|default:"76.542.210-5" }}</td>
+                                <td class="small fw-bold">{{ proveedor.nombre }}</td>
+                                <td class="small text-center">
+                                    <span class="proveedor-estado estado-activo">ACTIVO</span>
+                                </td>
+                                <td>
+                                    <button class="btn-action btn-edit btn-sm" onclick="editProveedor('{{ proveedor.id_proveedor }}')">Editar</button>
+                                    <button class="btn-action btn-delete btn-sm" onclick="deleteProveedor('{{ proveedor.id_proveedor }}')">Eliminar</button>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-3">No hay proveedores registrados</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let currentStep = 1;
+    
+    function showStep(step) {
+        // Ocultar todos los pasos
+        for (let i = 1; i <= 3; i++) {
+            document.getElementById(`content-step${i}`).classList.remove('active');
+            document.getElementById(`step${i}`).classList.remove('active', 'completed');
+        }
+        
+        // Mostrar el paso actual
+        document.getElementById(`content-step${step}`).classList.add('active');
+        document.getElementById(`step${step}`).classList.add('active');
+        
+        // Marcar como completados los pasos anteriores
+        for (let i = 1; i < step; i++) {
+            document.getElementById(`step${i}`).classList.add('completed');
+        }
+        
+        currentStep = step;
+    }
+    
+    function clearForm() {
+        document.getElementById('proveedorForm').reset();
+        showStep(1);
+    }
+    
+    function editProveedor(proveedorId) {
+        window.location.href = `/proveedores/editar/${proveedorId}/`;
+    }
+    
+    function deleteProveedor(proveedorId) {
+        if (confirm('¿Estás seguro de que deseas eliminar este proveedor?')) {
+            window.location.href = `/proveedores/eliminar/${proveedorId}/`;
+        }
+    }
+    
+    function addProveedorToList(proveedorData) {
+        const proveedoresList = document.getElementById('proveedoresList');
+        const emptyRow = proveedoresList.querySelector('td[colspan="4"]');
+        if (emptyRow) {
+            proveedoresList.innerHTML = '';
+        }
+        
+        const row = document.createElement('tr');
+        row.setAttribute('data-proveedor-id', proveedorData.id);
+        
+        row.innerHTML = `
+            <td class="small">${proveedorData.rut || '76.542.210-5'}</td>
+            <td class="small fw-bold">${proveedorData.nombre}</td>
+            <td class="small text-center">
+                <span class="proveedor-estado estado-activo">${proveedorData.estado || 'ACTIVO'}</span>
+            </td>
+            <td>
+                <button class="btn-action btn-edit btn-sm" onclick="editProveedor('${proveedorData.id}')">Editar</button>
+                <button class="btn-action btn-delete btn-sm" onclick="deleteProveedor('${proveedorData.id}')">Eliminar</button>
+            </td>
+        `;
+        
+        proveedoresList.insertBefore(row, proveedoresList.firstChild);
+    }
+    
+    // Manejar el envío del formulario con AJAX
+    document.getElementById('proveedorForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        fetch('{% url "proveedores:agregar_proveedor" %}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Agregar proveedor a la lista inmediatamente
+                addProveedorToList(data.proveedor);
+                
+                // Limpiar formulario
+                this.reset();
+                showStep(1);
+                
+                // Mostrar mensaje de éxito
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-success alert-dismissible fade show';
+                alertDiv.innerHTML = `
+                    Proveedor "${data.proveedor.nombre}" creado exitosamente.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                
+                const form = document.querySelector('.p-4');
+                form.insertBefore(alertDiv, form.firstChild);
+                
+                // Remover alerta después de 5 segundos
+                setTimeout(() => {
+                    if (alertDiv.parentNode) {
+                        alertDiv.remove();
+                    }
+                }, 5000);
+                
+            } else {
+                // Manejar errores
+                console.error('Error al crear proveedor:', data.errors);
+                
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+                alertDiv.innerHTML = `
+                    Error al crear el proveedor. Por favor verifica los datos.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                
+                const form = document.querySelector('.p-4');
+                form.insertBefore(alertDiv, form.firstChild);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+            alertDiv.innerHTML = `
+                Error de conexión. Intenta nuevamente.
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            const form = document.querySelector('.p-4');
+            form.insertBefore(alertDiv, form.firstChild);
+        });
+    });
+    
+    // Filtros de búsqueda en tiempo real
+    document.querySelector('.search-input').addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        const proveedorRows = document.querySelectorAll('#proveedoresList tr');
+        
+        proveedorRows.forEach(row => {
+            const rut = row.cells[0]?.textContent.toLowerCase() || '';
+            const razon = row.cells[1]?.textContent.toLowerCase() || '';
+            
+            if (rut.includes(searchTerm) || razon.includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        // Auto-focus en el primer campo
+        const firstInput = document.querySelector('input[name="rut"]');
+        if (firstInput) {
+            firstInput.focus();
+        }
+        
+        console.log('Proveedor form with 3 steps loaded');
+    });
+</script>
+{% endblock %}

@@ -1,71 +1,681 @@
 {% extends 'dashboard/base.html' %}
+{% load static %}
 
-{% block title %}Proveedores - Dulcería Lilis{% endblock %}
+{% block title %}Gestión de Proveedores - Dulcería Lilis{% endblock %}
+
+{% block extra_css %}
+<style>
+    .provider-card {
+        border: 1px solid var(--lilis-gray-300);
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+    
+    .provider-card:hover {
+        border-color: var(--lilis-blue);
+        box-shadow: 0 4px 12px rgba(79, 129, 247, 0.15);
+    }
+    
+    .provider-logo {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        background: var(--lilis-gray-200);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        color: var(--lilis-blue);
+    }
+    
+    .provider-rating {
+        color: var(--lilis-yellow);
+    }
+    
+    .contact-info {
+        font-size: 0.85rem;
+        color: var(--lilis-gray-600);
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<nav class="nav-tabs">
-    <a href="{% url 'dashboard:home' %}" class="nav-tab">
-        🏠 Dashboard
-    </a>
-    <a href="{% url 'dashboard:productos' %}" class="nav-tab">
-        📦 Productos
-    </a>
-    <a href="{% url 'dashboard:inventarios' %}" class="nav-tab">
-        📋 Inventarios
-    </a>
-    <a href="{% url 'dashboard:proveedores' %}" class="nav-tab active">
-        🏢 Proveedores
-    </a>
-    <a href="{% url 'dashboard:ventas' %}" class="nav-tab">
-        💰 Ventas
-    </a>
-</nav>
-
-<div class="card">
-    <div class="card-title">
-        <span class="icon">🏢</span>
-        Gestión de Proveedores
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="text-dark fw-bold mb-1">
+                <i class="bi bi-building text-lilis-blue me-2"></i>
+                Gestión de Proveedores
+            </h2>
+            <p class="text-muted mb-0">Administra la red de proveedores de la dulcería</p>
+        </div>
+        <button class="btn btn-lilis-primary" data-bs-toggle="modal" data-bs-target="#providerModal">
+            <i class="bi bi-plus-circle me-2"></i>
+            Nuevo Proveedor
+        </button>
     </div>
     
-    <div class="alert alert-info">
-        <strong>Información:</strong> Esta sección muestra datos ficticios de proveedores para demostración.
+    <!-- Stats Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="lilis-card">
+                <div class="lilis-card-body text-center">
+                    <div class="fs-2 fw-bold text-lilis-blue mb-1">{{ proveedores_count|default:0 }}</div>
+                    <div class="text-muted">
+                        <i class="bi bi-building me-1"></i>
+                        Total Proveedores
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="lilis-card">
+                <div class="lilis-card-body text-center">
+                    <div class="fs-2 fw-bold text-lilis-green mb-1">{{ proveedores_activos|default:0 }}</div>
+                    <div class="text-muted">
+                        <i class="bi bi-check-circle me-1"></i>
+                        Activos
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="lilis-card">
+                <div class="lilis-card-body text-center">
+                    <div class="fs-2 fw-bold text-lilis-yellow mb-1">{{ productos_proveedor|default:0 }}</div>
+                    <div class="text-muted">
+                        <i class="bi bi-box-seam me-1"></i>
+                        Productos Asociados
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="lilis-card">
+                <div class="lilis-card-body text-center">
+                    <div class="fs-2 fw-bold text-lilis-red mb-1">{{ ordenes_pendientes|default:0 }}</div>
+                    <div class="text-muted">
+                        <i class="bi bi-clock me-1"></i>
+                        Órdenes Pendientes
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <div style="margin-bottom: 1rem;">
-        <span style="color: #999; font-size: 0.9rem;">Funcionalidad en desarrollo</span>
-    </div>
-
-    <table class="table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Contacto</th>
-                <th>Teléfono</th>
-                <th>Estado</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for proveedor in proveedores %}
-            <tr>
-                <td>{{ proveedor.id }}</td>
-                <td><strong>{{ proveedor.nombre }}</strong></td>
-                <td>{{ proveedor.contacto }}</td>
-                <td>{{ proveedor.telefono }}</td>
-                <td>
-                    <span style="background: #28a745; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem;">
-                        Activo
-                    </span>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="5" style="text-align: center; color: #999; padding: 2rem;">
-                    No hay proveedores registrados
-                </td>
-            </tr>
+    
+    <!-- Alert Container -->
+    <div class="alert-container mb-3">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="lilis-alert lilis-alert-{{ message.tags|default:'info' }}">
+                    {{ message }}
+                </div>
             {% endfor %}
-        </tbody>
-    </table>
+        {% endif %}
+    </div>
+    
+    <!-- Filters Card -->
+    <div class="lilis-card mb-4">
+        <div class="lilis-card-body">
+            <h5 class="card-title mb-3">
+                <i class="bi bi-funnel me-2"></i>
+                Buscar proveedores
+            </h5>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <input type="text" class="lilis-form-control" id="searchProvider" placeholder="Buscar por nombre o RUC...">
+                </div>
+                <div class="col-md-2">
+                    <select class="lilis-form-control" id="filterCity">
+                        <option value="">Todas las ciudades</option>
+                        <option value="Lima">Lima</option>
+                        <option value="Arequipa">Arequipa</option>
+                        <option value="Cusco">Cusco</option>
+                        <option value="Trujillo">Trujillo</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="lilis-form-control" id="filterType">
+                        <option value="">Todos los tipos</option>
+                        <option value="distribuidor">Distribuidor</option>
+                        <option value="fabricante">Fabricante</option>
+                        <option value="mayorista">Mayorista</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="lilis-form-control" id="filterStatus">
+                        <option value="">Todos los estados</option>
+                        <option value="activo">Activo</option>
+                        <option value="inactivo">Inactivo</option>
+                        <option value="pendiente">Pendiente</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-outline-success w-100" onclick="exportProvidersToExcel()">
+                        <i class="bi bi-file-excel me-1"></i>
+                        Exportar a Excel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Providers Grid -->
+    <div class="row g-4" id="providersGrid">
+        {% for proveedor in proveedores %}
+        <div class="col-md-6 col-lg-4" data-provider-id="{{ proveedor.id_proveedor }}">
+            <div class="provider-card p-4 h-100">
+                <div class="d-flex align-items-start mb-3">
+                    <div class="provider-logo me-3">
+                        <i class="bi bi-building-fill"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h5 class="fw-bold mb-1">{{ proveedor.nombre }}</h5>
+                        <div class="contact-info mb-2">
+                            <div><i class="bi bi-person me-1"></i>{{ proveedor.contacto|default:"Sin contacto" }}</div>
+                            <div><i class="bi bi-telephone me-1"></i>{{ proveedor.telefono|default:"Sin teléfono" }}</div>
+                            <div><i class="bi bi-envelope me-1"></i>{{ proveedor.email|default:"Sin email" }}</div>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="badge bg-success me-2">Activo</span>
+                            <div class="provider-rating">
+                                {% for i in "12345" %}
+                                    <i class="bi bi-star-fill"></i>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="border-top pt-3">
+                    <div class="row g-2 text-center mb-3">
+                        <div class="col">
+                            <div class="fw-bold text-lilis-blue">0</div>
+                            <small class="text-muted">Productos</small>
+                        </div>
+                        <div class="col">
+                            <div class="fw-bold text-lilis-green">0</div>
+                            <small class="text-muted">Órdenes</small>
+                        </div>
+                        <div class="col">
+                            <div class="fw-bold text-lilis-yellow">4.5</div>
+                            <small class="text-muted">Rating</small>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-primary btn-sm flex-fill" onclick="viewProvider('{{ proveedor.id_proveedor }}')">
+                            <i class="bi bi-eye me-1"></i>
+                            Ver
+                        </button>
+                        {% if user.is_superuser or user.id_rol.nombre == 'Administrador' %}
+                        <button class="btn btn-outline-warning btn-sm flex-fill" onclick="editProvider('{{ proveedor.id_proveedor }}')">
+                            <i class="bi bi-pencil me-1"></i>
+                            Editar
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="lilis-card">
+                <div class="lilis-card-body text-center py-5">
+                    <div class="text-muted">
+                        <i class="bi bi-building display-4 d-block mb-3" style="color: var(--lilis-gray-300);"></i>
+                        <h5 class="mb-3">No se encontraron proveedores</h5>
+                        <p class="mb-3">Comienza agregando tu primer proveedor</p>
+                        <button class="btn btn-lilis-primary" data-bs-toggle="modal" data-bs-target="#providerModal">
+                            <i class="bi bi-plus-circle me-2"></i>
+                            Crear primer proveedor
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
 </div>
+
+<!-- Provider Modal -->
+<div class="modal fade" id="providerModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title">
+                    <i class="bi bi-building text-lilis-blue me-2"></i>
+                    <span id="modalTitle">Nuevo Proveedor</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            
+            <div class="modal-body">
+                <!-- Step Indicator -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-center">
+                            <div class="d-flex align-items-center">
+                                <div class="step-item active" data-step="1">
+                                    <div class="step-number">1</div>
+                                    <div class="step-label">Identificación y Contacto</div>
+                                </div>
+                                <div class="step-line"></div>
+                                <div class="step-item" data-step="2">
+                                    <div class="step-number">2</div>
+                                    <div class="step-label">Dirección y Comercial</div>
+                                </div>
+                                <div class="step-line"></div>
+                                <div class="step-item" data-step="3">
+                                    <div class="step-number">3</div>
+                                    <div class="step-label">Relación con Productos</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <form id="providerForm">
+                    {% csrf_token %}
+                    
+                    <!-- Step 1: Identificación y Contacto -->
+                    <div class="step-content" data-step="1">
+                        <h6 class="text-lilis-blue mb-3">
+                            <i class="bi bi-person-badge me-2"></i>
+                            Información de Identificación y Contacto
+                        </h6>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="lilis-form-label">Nombre del Proveedor *</label>
+                                <input type="text" class="lilis-form-control" name="nombre" required>
+                                <div class="lilis-form-text">Nombre comercial o razón social</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="lilis-form-label">RUC *</label>
+                                <input type="text" class="lilis-form-control" name="ruc" required maxlength="11">
+                                <div class="lilis-form-text">Registro Único de Contribuyente</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="lilis-form-label">Persona de Contacto</label>
+                                <input type="text" class="lilis-form-control" name="contacto">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="lilis-form-label">Cargo del Contacto</label>
+                                <input type="text" class="lilis-form-control" name="cargo_contacto">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="lilis-form-label">Teléfono Principal *</label>
+                                <input type="tel" class="lilis-form-control" name="telefono" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="lilis-form-label">Teléfono Secundario</label>
+                                <input type="tel" class="lilis-form-control" name="telefono_secundario">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="lilis-form-label">Email Principal *</label>
+                                <input type="email" class="lilis-form-control" name="email" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="lilis-form-label">Email Secundario</label>
+                                <input type="email" class="lilis-form-control" name="email_secundario">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 2: Dirección y Comercial -->
+                    <div class="step-content d-none" data-step="2">
+                        <h6 class="text-lilis-blue mb-3">
+                            <i class="bi bi-geo-alt me-2"></i>
+                            Información de Dirección y Comercial
+                        </h6>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <label class="lilis-form-label">Dirección *</label>
+                                <input type="text" class="lilis-form-control" name="direccion" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="lilis-form-label">Código Postal</label>
+                                <input type="text" class="lilis-form-control" name="codigo_postal">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="lilis-form-label">Distrito</label>
+                                <input type="text" class="lilis-form-control" name="distrito">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="lilis-form-label">Provincia</label>
+                                <input type="text" class="lilis-form-control" name="provincia">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="lilis-form-label">Departamento</label>
+                                <select class="lilis-form-control" name="departamento">
+                                    <option value="">Seleccionar...</option>
+                                    <option value="Lima">Lima</option>
+                                    <option value="Arequipa">Arequipa</option>
+                                    <option value="Cusco">Cusco</option>
+                                    <option value="Trujillo">La Libertad</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="lilis-form-label">Tipo de Proveedor</label>
+                                <select class="lilis-form-control" name="tipo_proveedor">
+                                    <option value="distribuidor">Distribuidor</option>
+                                    <option value="fabricante">Fabricante</option>
+                                    <option value="mayorista">Mayorista</option>
+                                    <option value="minorista">Minorista</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="lilis-form-label">Condiciones de Pago</label>
+                                <select class="lilis-form-control" name="condiciones_pago">
+                                    <option value="contado">Contado</option>
+                                    <option value="credito_15">Crédito 15 días</option>
+                                    <option value="credito_30">Crédito 30 días</option>
+                                    <option value="credito_45">Crédito 45 días</option>
+                                    <option value="credito_60">Crédito 60 días</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="lilis-form-label">Tiempo de Entrega (días)</label>
+                                <input type="number" class="lilis-form-control" name="tiempo_entrega" min="1" max="365">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="lilis-form-label">Monto Mínimo de Pedido</label>
+                                <input type="number" step="0.01" class="lilis-form-control" name="monto_minimo">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 3: Relación con Productos -->
+                    <div class="step-content d-none" data-step="3">
+                        <h6 class="text-lilis-blue mb-3">
+                            <i class="bi bi-box-seam me-2"></i>
+                            Relación con Productos
+                        </h6>
+                        
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="lilis-form-label">Productos que Suministra</label>
+                                <div class="lilis-form-text mb-2">Selecciona los productos que este proveedor puede suministrar</div>
+                                <div class="border rounded p-3" style="max-height: 300px; overflow-y: auto;">
+                                    <div class="row">
+                                        {% for producto in productos_disponibles %}
+                                        <div class="col-md-6 mb-2">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="productos[]" value="{{ producto.id_producto }}" id="product_{{ producto.id_producto }}">
+                                                <label class="form-check-label" for="product_{{ producto.id_producto }}">
+                                                    {{ producto.nombre }}
+                                                </label>
+                                            </div>
+                                        </div>
+                                        {% empty %}
+                                        <div class="col-12 text-center text-muted py-3">
+                                            <i class="bi bi-info-circle me-2"></i>
+                                            No hay productos disponibles. Crea productos primero.
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <label class="lilis-form-label">Observaciones</label>
+                                <textarea class="lilis-form-control" name="observaciones" rows="4" placeholder="Información adicional sobre el proveedor..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="modal-footer bg-light">
+                <div class="d-flex justify-content-between w-100">
+                    <button type="button" class="btn btn-outline-secondary" id="prevStepBtn" onclick="previousStep()" style="display: none;">
+                        <i class="bi bi-arrow-left me-1"></i>
+                        Anterior
+                    </button>
+                    <div class="ms-auto d-flex gap-2">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-lilis-primary" id="nextStepBtn" onclick="nextStep()">
+                            Siguiente
+                            <i class="bi bi-arrow-right ms-1"></i>
+                        </button>
+                        <button type="button" class="btn btn-success" id="submitBtn" onclick="submitProvider()" style="display: none;">
+                            <i class="bi bi-check-lg me-1"></i>
+                            Guardar Proveedor
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let currentStep = 1;
+    const totalSteps = 3;
+    
+    // Provider Management Functions
+    function viewProvider(providerId) {
+        LilisSystem.showAlert(`Viendo detalles del proveedor ${providerId}`, 'info');
+    }
+    
+    function editProvider(providerId) {
+        LilisSystem.showAlert(`Editando proveedor ${providerId}`, 'info');
+        // Aquí cargarías los datos del proveedor en el modal
+    }
+    
+    // Step Navigation Functions
+    function nextStep() {
+        if (validateCurrentStep()) {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                updateStepDisplay();
+            }
+        }
+    }
+    
+    function previousStep() {
+        if (currentStep > 1) {
+            currentStep--;
+            updateStepDisplay();
+        }
+    }
+    
+    function updateStepDisplay() {
+        // Update step indicators
+        document.querySelectorAll('.step-item').forEach((item, index) => {
+            const stepNumber = index + 1;
+            item.classList.remove('active', 'completed');
+            
+            if (stepNumber < currentStep) {
+                item.classList.add('completed');
+            } else if (stepNumber === currentStep) {
+                item.classList.add('active');
+            }
+        });
+        
+        // Update step content
+        document.querySelectorAll('.step-content').forEach((content, index) => {
+            const stepNumber = index + 1;
+            if (stepNumber === currentStep) {
+                content.classList.remove('d-none');
+            } else {
+                content.classList.add('d-none');
+            }
+        });
+        
+        // Update buttons
+        const prevBtn = document.getElementById('prevStepBtn');
+        const nextBtn = document.getElementById('nextStepBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        
+        prevBtn.style.display = currentStep === 1 ? 'none' : 'block';
+        
+        if (currentStep === totalSteps) {
+            nextBtn.style.display = 'none';
+            submitBtn.style.display = 'block';
+        } else {
+            nextBtn.style.display = 'block';
+            submitBtn.style.display = 'none';
+        }
+    }
+    
+    function validateCurrentStep() {
+        const currentStepContent = document.querySelector(`.step-content[data-step="${currentStep}"]`);
+        const requiredFields = currentStepContent.querySelectorAll('[required]');
+        let isValid = true;
+        
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                field.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                field.classList.remove('is-invalid');
+            }
+        });
+        
+        if (!isValid) {
+            LilisSystem.showAlert('Por favor completa todos los campos requeridos', 'warning');
+        }
+        
+        return isValid;
+    }
+    
+    function submitProvider() {
+        if (validateCurrentStep()) {
+            const formData = new FormData(document.getElementById('providerForm'));
+            
+            LilisSystem.showAlert('Guardando proveedor...', 'info');
+            
+            // Simular guardado
+            setTimeout(() => {
+                LilisSystem.showAlert('Proveedor guardado exitosamente', 'success');
+                bootstrap.Modal.getInstance(document.getElementById('providerModal')).hide();
+                resetProviderForm();
+            }, 1500);
+        }
+    }
+    
+    function resetProviderForm() {
+        currentStep = 1;
+        document.getElementById('providerForm').reset();
+        document.querySelectorAll('.is-invalid').forEach(field => {
+            field.classList.remove('is-invalid');
+        });
+        updateStepDisplay();
+    }
+    
+    // Filter Functions
+    function filterProviders() {
+        const searchTerm = document.getElementById('searchProvider').value.toLowerCase();
+        const cityFilter = document.getElementById('filterCity').value;
+        const typeFilter = document.getElementById('filterType').value;
+        const statusFilter = document.getElementById('filterStatus').value;
+        
+        const providerCards = document.querySelectorAll('#providersGrid > div[data-provider-id]');
+        
+        providerCards.forEach(card => {
+            const name = card.querySelector('h5').textContent.toLowerCase();
+            const visible = (!searchTerm || name.includes(searchTerm));
+            
+            if (visible) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+    
+    function exportProvidersToExcel() {
+        LilisSystem.showAlert('Exportando proveedores a Excel...', 'info');
+    }
+    
+    // Event Listeners
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize step display
+        updateStepDisplay();
+        
+        // Filter event listeners
+        const searchInput = document.getElementById('searchProvider');
+        if (searchInput) {
+            searchInput.addEventListener('input', filterProviders);
+        }
+        
+        ['filterCity', 'filterType', 'filterStatus'].forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('change', filterProviders);
+            }
+        });
+        
+        // Modal event listeners
+        const modal = document.getElementById('providerModal');
+        if (modal) {
+            modal.addEventListener('hidden.bs.modal', resetProviderForm);
+        }
+        
+        console.log('Provider management loaded');
+    });
+</script>
+
+<style>
+    .step-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        min-width: 120px;
+    }
+    
+    .step-number {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--lilis-gray-300);
+        color: var(--lilis-gray-600);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        margin-bottom: 8px;
+        transition: all 0.3s ease;
+    }
+    
+    .step-item.active .step-number {
+        background: var(--lilis-blue);
+        color: white;
+    }
+    
+    .step-item.completed .step-number {
+        background: var(--lilis-green);
+        color: white;
+    }
+    
+    .step-label {
+        font-size: 0.85rem;
+        color: var(--lilis-gray-600);
+        font-weight: 500;
+    }
+    
+    .step-item.active .step-label {
+        color: var(--lilis-blue);
+        font-weight: 600;
+    }
+    
+    .step-item.completed .step-label {
+        color: var(--lilis-green);
+        font-weight: 600;
+    }
+    
+    .step-line {
+        width: 100px;
+        height: 2px;
+        background: var(--lilis-gray-300);
+        margin: 0 10px;
+        margin-top: 20px;
+    }
+</style>
 {% endblock %}

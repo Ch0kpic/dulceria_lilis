@@ -1,116 +1,667 @@
 {% extends 'dashboard/base.html' %}
+{% load static %}
 
-{% block title %}Inventarios - Dulcería Lilis{% endblock %}
+{% block title %}Gestión de Inventarios - Dulcería Lilis{% endblock %}
+
+{% block extra_css %}
+<style>
+    .inventory-card {
+        border-left: 4px solid var(--lilis-blue);
+        transition: all 0.3s ease;
+    }
+    
+    .inventory-card:hover {
+        box-shadow: 0 4px 12px rgba(79, 129, 247, 0.15);
+        transform: translateY(-2px);
+    }
+    
+    .stock-badge {
+        padding: 0.375rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .stock-high { background: var(--lilis-green-light); color: var(--lilis-green-dark); }
+    .stock-medium { background: var(--lilis-yellow-light); color: var(--lilis-yellow-dark); }
+    .stock-low { background: var(--lilis-red-light); color: var(--lilis-red-dark); }
+    .stock-empty { background: var(--lilis-gray-200); color: var(--lilis-gray-600); }
+    
+    .movement-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+    }
+    
+    .movement-in { background: var(--lilis-green-light); color: var(--lilis-green-dark); }
+    .movement-out { background: var(--lilis-red-light); color: var(--lilis-red-dark); }
+    .movement-transfer { background: var(--lilis-blue-light); color: var(--lilis-blue-dark); }
+    
+    .quick-stats {
+        background: linear-gradient(135deg, var(--lilis-blue), var(--lilis-blue-dark));
+        color: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<nav class="nav-tabs">
-    <a href="{% url 'dashboard:home' %}" class="nav-tab">
-        🏠 Dashboard
-    </a>
-    <a href="{% url 'dashboard:productos' %}" class="nav-tab">
-        📦 Productos
-    </a>
-    <a href="{% url 'dashboard:inventarios' %}" class="nav-tab active">
-        📋 Inventarios
-    </a>
-    {% if user.is_superuser or user.id_rol.nombre == 'Administrador' %}
-    <a href="{% url 'dashboard:proveedores' %}" class="nav-tab">
-        🏢 Proveedores
-    </a>
-    <a href="{% url 'dashboard:ventas' %}" class="nav-tab">
-        💰 Ventas
-    </a>
-    {% endif %}
-</nav>
-
-<div class="card">
-    <div class="card-title">
-        <span class="icon">📋</span>
-        Control de Inventarios
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="text-dark fw-bold mb-1">
+                <i class="bi bi-clipboard-check text-lilis-blue me-2"></i>
+                Gestión de Inventarios
+            </h2>
+            <p class="text-muted mb-0">Control de stock y movimientos de inventario</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#movementModal" data-type="entrada">
+                <i class="bi bi-plus-circle me-2"></i>
+                Entrada
+            </button>
+            <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#movementModal" data-type="salida">
+                <i class="bi bi-dash-circle me-2"></i>
+                Salida
+            </button>
+            <button class="btn btn-lilis-primary" onclick="generateInventoryReport()">
+                <i class="bi bi-file-earmark-text me-2"></i>
+                Reporte
+            </button>
+        </div>
     </div>
     
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
-                {{ message }}
+    <!-- Quick Stats -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="quick-stats text-center">
+                <div class="fs-2 fw-bold mb-1">{{ total_productos|default:0 }}</div>
+                <div class="opacity-75">
+                    <i class="bi bi-box-seam me-1"></i>
+                    Productos en Stock
+                </div>
             </div>
-        {% endfor %}
-    {% endif %}
-
-    <div style="margin-bottom: 1rem;">
-        {% if user.is_superuser or user.id_rol.nombre == 'Administrador' %}
-        <a href="{% url 'dashboard:agregar_inventario' %}" class="btn btn-primary">➕ Agregar Nuevo Inventario</a>
-        {% else %}
-        <span style="color: #999; font-size: 0.9rem;">Solo administradores pueden agregar inventarios</span>
+        </div>
+        <div class="col-md-3">
+            <div class="lilis-card">
+                <div class="lilis-card-body text-center">
+                    <div class="fs-2 fw-bold text-lilis-green mb-1">{{ stock_alto|default:0 }}</div>
+                    <div class="text-muted">
+                        <i class="bi bi-arrow-up-circle me-1"></i>
+                        Stock Alto
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="lilis-card">
+                <div class="lilis-card-body text-center">
+                    <div class="fs-2 fw-bold text-lilis-yellow mb-1">{{ stock_medio|default:0 }}</div>
+                    <div class="text-muted">
+                        <i class="bi bi-dash-circle me-1"></i>
+                        Stock Medio
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="lilis-card">
+                <div class="lilis-card-body text-center">
+                    <div class="fs-2 fw-bold text-lilis-red mb-1">{{ stock_bajo|default:0 }}</div>
+                    <div class="text-muted">
+                        <i class="bi bi-exclamation-triangle me-1"></i>
+                        Stock Bajo
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Alert Container -->
+    <div class="alert-container mb-3">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="lilis-alert lilis-alert-{{ message.tags|default:'info' }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
         {% endif %}
     </div>
-
-    <table class="table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Producto</th>
-                <th>Cantidad Actual</th>
-                <th>Ubicación</th>
-                <th>Última Actualización</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for inventario in inventarios %}
-            <tr>
-                <td>{{ inventario.id_inventario }}</td>
-                <td><strong>{{ inventario.id_producto.nombre }}</strong></td>
-                <td>
-                    <span style="{% if inventario.cantidad_actual < 10 %}color: #dc3545; font-weight: bold;{% elif inventario.cantidad_actual < 50 %}color: #ffc107; font-weight: bold;{% else %}color: #28a745;{% endif %}">
-                        {{ inventario.cantidad_actual }} unidades
-                    </span>
-                </td>
-                <td>{{ inventario.ubicacion }}</td>
-                <td>{{ inventario.fecha_ultima_actualizacion|date:"d/m/Y H:i" }}</td>
-                <td>
-                    {% if user.is_superuser or user.id_rol.nombre == 'Administrador' %}
-                    <a href="{% url 'dashboard:editar_inventario' inventario.id_inventario %}" class="btn btn-secondary">✏️ Editar</a>
-                    {% else %}
-                    <span style="color: #999; font-size: 0.9rem;">Solo lectura</span>
-                    {% endif %}
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="6" style="text-align: center; color: #999; padding: 2rem;">
-                    No hay registros de inventario
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    
+    <!-- Navigation Tabs -->
+    <ul class="nav nav-pills nav-fill mb-4" id="inventoryTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="stock-tab" data-bs-toggle="pill" data-bs-target="#stock-panel" type="button">
+                <i class="bi bi-boxes me-2"></i>
+                Estado de Stock
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="movements-tab" data-bs-toggle="pill" data-bs-target="#movements-panel" type="button">
+                <i class="bi bi-arrow-left-right me-2"></i>
+                Movimientos
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="alerts-tab" data-bs-toggle="pill" data-bs-target="#alerts-panel" type="button">
+                <i class="bi bi-bell me-2"></i>
+                Alertas de Stock
+            </button>
+        </li>
+    </ul>
+    
+    <!-- Tab Content -->
+    <div class="tab-content" id="inventoryTabsContent">
+        <!-- Stock Panel -->
+        <div class="tab-pane fade show active" id="stock-panel">
+            <!-- Filters -->
+            <div class="lilis-card mb-4">
+                <div class="lilis-card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="bi bi-funnel me-2"></i>
+                        Filtrar inventario
+                    </h5>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <input type="text" class="lilis-form-control" id="searchStock" placeholder="Buscar producto...">
+                        </div>
+                        <div class="col-md-2">
+                            <select class="lilis-form-control" id="filterStockLevel">
+                                <option value="">Todos los niveles</option>
+                                <option value="alto">Stock alto</option>
+                                <option value="medio">Stock medio</option>
+                                <option value="bajo">Stock bajo</option>
+                                <option value="agotado">Agotado</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select class="lilis-form-control" id="filterProvider">
+                                <option value="">Todos los proveedores</option>
+                                {% for proveedor in proveedores %}
+                                <option value="{{ proveedor.id_proveedor }}">{{ proveedor.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-outline-info w-100" onclick="refreshInventory()">
+                                <i class="bi bi-arrow-clockwise me-1"></i>
+                                Actualizar
+                            </button>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-outline-success w-100" onclick="exportStockToExcel()">
+                                <i class="bi bi-file-excel me-1"></i>
+                                Exportar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Stock Grid -->
+            <div class="row g-4" id="stockGrid">
+                {% for inventario in inventarios %}
+                <div class="col-md-6 col-lg-4" data-product-id="{{ inventario.id_producto.id_producto }}">
+                    <div class="lilis-card inventory-card h-100">
+                        <div class="lilis-card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="flex-grow-1">
+                                    <h6 class="fw-bold mb-1">{{ inventario.id_producto.nombre }}</h6>
+                                    <small class="text-muted">SKU: {{ inventario.id_producto.id_producto|stringformat:"04d" }}</small>
+                                </div>
+                                <span class="stock-badge stock-medium">Normal</span>
+                            </div>
+                            
+                            <div class="row g-2 mb-3">
+                                <div class="col-6 text-center">
+                                    <div class="fs-4 fw-bold text-lilis-blue">{{ inventario.stock_actual|default:0 }}</div>
+                                    <small class="text-muted">Stock Actual</small>
+                                </div>
+                                <div class="col-6 text-center">
+                                    <div class="fs-4 fw-bold text-lilis-green">{{ inventario.stock_minimo|default:0 }}</div>
+                                    <small class="text-muted">Stock Mínimo</small>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <small class="text-muted">Nivel de stock</small>
+                                    <small class="text-muted">75%</small>
+                                </div>
+                                <div class="progress" style="height: 6px;">
+                                    <div class="progress-bar bg-success" style="width: 75%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-outline-success btn-sm flex-fill" onclick="quickEntry('{{ inventario.id_inventario }}')">
+                                    <i class="bi bi-plus me-1"></i>
+                                    Entrada
+                                </button>
+                                <button class="btn btn-outline-danger btn-sm flex-fill" onclick="quickExit('{{ inventario.id_inventario }}')">
+                                    <i class="bi bi-dash me-1"></i>
+                                    Salida
+                                </button>
+                                <button class="btn btn-outline-info btn-sm" onclick="viewInventoryDetails('{{ inventario.id_inventario }}')" title="Ver detalles">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="lilis-card">
+                        <div class="lilis-card-body text-center py-5">
+                            <div class="text-muted">
+                                <i class="bi bi-clipboard-x display-4 d-block mb-3" style="color: var(--lilis-gray-300);"></i>
+                                <h5 class="mb-3">No hay inventarios registrados</h5>
+                                <p class="mb-3">Los inventarios se crean automáticamente al registrar productos</p>
+                                <a href="{% url 'dashboard:productos' %}" class="btn btn-lilis-primary">
+                                    <i class="bi bi-box-seam me-2"></i>
+                                    Ver productos
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Movements Panel -->
+        <div class="tab-pane fade" id="movements-panel">
+            <!-- Movements Filter -->
+            <div class="lilis-card mb-4">
+                <div class="lilis-card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <input type="date" class="lilis-form-control" id="dateFrom" value="{{ today|date:'Y-m-d' }}">
+                        </div>
+                        <div class="col-md-3">
+                            <input type="date" class="lilis-form-control" id="dateTo" value="{{ today|date:'Y-m-d' }}">
+                        </div>
+                        <div class="col-md-2">
+                            <select class="lilis-form-control" id="filterMovementType">
+                                <option value="">Todos los tipos</option>
+                                <option value="entrada">Entrada</option>
+                                <option value="salida">Salida</option>
+                                <option value="transferencia">Transferencia</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-lilis-primary w-100" onclick="filterMovements()">
+                                <i class="bi bi-search me-1"></i>
+                                Filtrar
+                            </button>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-outline-success w-100" onclick="exportMovementsToExcel()">
+                                <i class="bi bi-file-excel me-1"></i>
+                                Exportar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Movements List -->
+            <div class="lilis-card">
+                <div class="lilis-card-header">
+                    <h5 class="lilis-card-title mb-0">
+                        <i class="bi bi-list me-2"></i>
+                        Movimientos Recientes
+                    </h5>
+                </div>
+                
+                <div class="lilis-card-body">
+                    <div class="row g-3" id="movementsList">
+                        <!-- Ejemplo de movimientos -->
+                        <div class="col-12">
+                            <div class="d-flex align-items-center p-3 border rounded">
+                                <div class="movement-icon movement-in me-3">
+                                    <i class="bi bi-arrow-down"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6 class="mb-1">Entrada de Chocolates</h6>
+                                            <small class="text-muted">Por: Usuario Admin • Hoy 14:30</small>
+                                        </div>
+                                        <div class="text-end">
+                                            <div class="fw-bold text-success">+50 unidades</div>
+                                            <small class="text-muted">Stock actual: 150</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-12">
+                            <div class="d-flex align-items-center p-3 border rounded">
+                                <div class="movement-icon movement-out me-3">
+                                    <i class="bi bi-arrow-up"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6 class="mb-1">Venta de Caramelos</h6>
+                                            <small class="text-muted">Venta #001 • Hoy 12:15</small>
+                                        </div>
+                                        <div class="text-end">
+                                            <div class="fw-bold text-danger">-25 unidades</div>
+                                            <small class="text-muted">Stock actual: 75</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center py-4" id="noMovements" style="display: none;">
+                        <i class="bi bi-clock-history display-4 text-muted mb-3"></i>
+                        <h6 class="text-muted">No hay movimientos en el período seleccionado</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Alerts Panel -->
+        <div class="tab-pane fade" id="alerts-panel">
+            <div class="row g-4">
+                <div class="col-md-8">
+                    <div class="lilis-card">
+                        <div class="lilis-card-header">
+                            <h5 class="lilis-card-title mb-0">
+                                <i class="bi bi-exclamation-triangle text-warning me-2"></i>
+                                Productos con Stock Bajo
+                            </h5>
+                        </div>
+                        <div class="lilis-card-body">
+                            <div class="list-group list-group-flush">
+                                <div class="list-group-item px-0">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1">Chocolates Premium</h6>
+                                            <small class="text-muted">Stock actual: 5 unidades (Mínimo: 20)</small>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge bg-warning">Stock Bajo</span>
+                                            <div class="mt-1">
+                                                <button class="btn btn-sm btn-outline-primary" onclick="reorderProduct(1)">Reabastecer</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="list-group-item px-0">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1">Galletas de Vainilla</h6>
+                                            <small class="text-muted">Stock actual: 0 unidades (Mínimo: 15)</small>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge bg-danger">Agotado</span>
+                                            <div class="mt-1">
+                                                <button class="btn btn-sm btn-outline-primary" onclick="reorderProduct(2)">Reabastecer</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="lilis-card">
+                        <div class="lilis-card-header">
+                            <h5 class="lilis-card-title mb-0">
+                                <i class="bi bi-gear text-lilis-blue me-2"></i>
+                                Configuración de Alertas
+                            </h5>
+                        </div>
+                        <div class="lilis-card-body">
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="alertStockBajo" checked>
+                                <label class="form-check-label" for="alertStockBajo">
+                                    Alertas de stock bajo
+                                </label>
+                            </div>
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="alertVencimiento" checked>
+                                <label class="form-check-label" for="alertVencimiento">
+                                    Alertas de vencimiento
+                                </label>
+                            </div>
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="alertRestock">
+                                <label class="form-check-label" for="alertRestock">
+                                    Sugerencias de restock
+                                </label>
+                            </div>
+                            <button class="btn btn-lilis-primary btn-sm w-100" onclick="saveAlertSettings()">
+                                Guardar configuración
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-<style>
-.alert {
-    padding: 12px 16px;
-    border-radius: 8px;
-    margin-bottom: 1rem;
-    font-weight: 500;
-}
+<!-- Movement Modal -->
+<div class="modal fade" id="movementModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-arrow-left-right text-lilis-blue me-2"></i>
+                    <span id="movementModalTitle">Movimiento de Inventario</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            
+            <div class="modal-body">
+                <form id="movementForm">
+                    {% csrf_token %}
+                    <input type="hidden" id="movementType" name="tipo_movimiento">
+                    
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="lilis-form-label">Producto *</label>
+                            <select class="lilis-form-control" name="producto" required>
+                                <option value="">Seleccionar producto...</option>
+                                {% for inventario in inventarios %}
+                                <option value="{{ inventario.id_inventario }}">
+                                    {{ inventario.id_producto.nombre }} (Stock: {{ inventario.stock_actual|default:0 }})
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="lilis-form-label">Cantidad *</label>
+                            <input type="number" class="lilis-form-control" name="cantidad" min="1" required>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="lilis-form-label">Fecha</label>
+                            <input type="date" class="lilis-form-control" name="fecha" value="{{ today|date:'Y-m-d' }}">
+                        </div>
+                        
+                        <div class="col-12" id="providerField" style="display: none;">
+                            <label class="lilis-form-label">Proveedor</label>
+                            <select class="lilis-form-control" name="proveedor">
+                                <option value="">Seleccionar proveedor...</option>
+                                {% for proveedor in proveedores %}
+                                <option value="{{ proveedor.id_proveedor }}">{{ proveedor.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="col-12">
+                            <label class="lilis-form-label">Motivo/Observaciones</label>
+                            <textarea class="lilis-form-control" name="observaciones" rows="3" placeholder="Descripción del movimiento..."></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" onclick="submitMovement()">
+                    <i class="bi bi-check-lg me-1"></i>
+                    Registrar Movimiento
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
 
-.alert-success {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
-
-.alert-error {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
-
-.alert-info {
-    background-color: #d1ecf1;
-    color: #0c5460;
-    border: 1px solid #bee5eb;
-}
-</style>
+{% block extra_js %}
+<script>
+    // Inventory Management Functions
+    function quickEntry(inventoryId) {
+        document.getElementById('movementType').value = 'entrada';
+        document.getElementById('movementModalTitle').textContent = 'Entrada de Inventario';
+        document.getElementById('providerField').style.display = 'block';
+        
+        const modal = new bootstrap.Modal(document.getElementById('movementModal'));
+        modal.show();
+    }
+    
+    function quickExit(inventoryId) {
+        document.getElementById('movementType').value = 'salida';
+        document.getElementById('movementModalTitle').textContent = 'Salida de Inventario';
+        document.getElementById('providerField').style.display = 'none';
+        
+        const modal = new bootstrap.Modal(document.getElementById('movementModal'));
+        modal.show();
+    }
+    
+    function viewInventoryDetails(inventoryId) {
+        LilisSystem.showAlert(`Viendo detalles del inventario ${inventoryId}`, 'info');
+    }
+    
+    function submitMovement() {
+        const form = document.getElementById('movementForm');
+        const formData = new FormData(form);
+        
+        // Validation
+        if (!formData.get('producto') || !formData.get('cantidad')) {
+            LilisSystem.showAlert('Por favor completa todos los campos requeridos', 'warning');
+            return;
+        }
+        
+        LilisSystem.showAlert('Registrando movimiento...', 'info');
+        
+        // Simulate API call
+        setTimeout(() => {
+            LilisSystem.showAlert('Movimiento registrado exitosamente', 'success');
+            bootstrap.Modal.getInstance(document.getElementById('movementModal')).hide();
+            form.reset();
+            refreshInventory();
+        }, 1500);
+    }
+    
+    function refreshInventory() {
+        LilisSystem.showAlert('Actualizando inventario...', 'info');
+        // Simulate refresh
+        setTimeout(() => {
+            LilisSystem.showAlert('Inventario actualizado', 'success');
+        }, 1000);
+    }
+    
+    function generateInventoryReport() {
+        LilisSystem.showAlert('Generando reporte de inventario...', 'info');
+    }
+    
+    function exportStockToExcel() {
+        LilisSystem.showAlert('Exportando stock a Excel...', 'info');
+    }
+    
+    function exportMovementsToExcel() {
+        LilisSystem.showAlert('Exportando movimientos a Excel...', 'info');
+    }
+    
+    function filterMovements() {
+        const dateFrom = document.getElementById('dateFrom').value;
+        const dateTo = document.getElementById('dateTo').value;
+        const movementType = document.getElementById('filterMovementType').value;
+        
+        LilisSystem.showAlert('Filtrando movimientos...', 'info');
+        // Implement filtering logic here
+    }
+    
+    function reorderProduct(productId) {
+        LilisSystem.showAlert(`Iniciando proceso de reabastecimiento para producto ${productId}`, 'info');
+    }
+    
+    function saveAlertSettings() {
+        LilisSystem.showAlert('Configuración de alertas guardada', 'success');
+    }
+    
+    // Filter Functions for Stock Panel
+    function filterStock() {
+        const searchTerm = document.getElementById('searchStock').value.toLowerCase();
+        const stockLevel = document.getElementById('filterStockLevel').value;
+        const provider = document.getElementById('filterProvider').value;
+        
+        const cards = document.querySelectorAll('#stockGrid > div[data-product-id]');
+        
+        cards.forEach(card => {
+            const productName = card.querySelector('h6').textContent.toLowerCase();
+            const visible = (!searchTerm || productName.includes(searchTerm));
+            
+            if (visible) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+    
+    // Modal Event Handler
+    document.addEventListener('DOMContentLoaded', function() {
+        // Modal event listener for movement type
+        const movementModal = document.getElementById('movementModal');
+        if (movementModal) {
+            movementModal.addEventListener('show.bs.modal', function(event) {
+                const button = event.relatedTarget;
+                if (button) {
+                    const type = button.getAttribute('data-type');
+                    if (type === 'entrada') {
+                        quickEntry();
+                    } else if (type === 'salida') {
+                        quickExit();
+                    }
+                }
+            });
+        }
+        
+        // Filter event listeners
+        const searchStock = document.getElementById('searchStock');
+        if (searchStock) {
+            searchStock.addEventListener('input', filterStock);
+        }
+        
+        ['filterStockLevel', 'filterProvider'].forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('change', filterStock);
+            }
+        });
+        
+        console.log('Inventory management loaded');
+    });
+</script>
 {% endblock %}

@@ -1,0 +1,94 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Eliminar Usuario - Dulcería Lilis{% endblock %}
+
+{% block extra_css %}
+<style>
+    .delete-warning {
+        background: linear-gradient(135deg, #dc3545, #c82333);
+        color: white;
+        border-radius: 15px;
+        padding: 2rem;
+    }
+    
+    .warning-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="text-dark fw-bold mb-1">
+                <i class="bi bi-exclamation-triangle text-danger me-2"></i>
+                Eliminar Usuario
+            </h2>
+            <p class="text-muted mb-0">Confirmación de eliminación de cuenta de usuario</p>
+        </div>
+        <a href="{% url 'usuarios:lista_usuarios' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-2"></i>
+            Volver a Usuarios
+        </a>
+    </div>
+
+    <!-- Confirmation Card -->
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="delete-warning text-center">
+                <i class="bi bi-exclamation-triangle-fill warning-icon"></i>
+                <h3 class="fw-bold mb-3">¿Estás seguro?</h3>
+                <p class="mb-4">
+                    Estás a punto de eliminar permanentemente al usuario:
+                </p>
+            </div>
+            
+            <div class="lilis-card mt-4">
+                <div class="lilis-card-body">
+                    <!-- User Info -->
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="bg-lilis-purple-light rounded-circle p-3 me-3">
+                            <i class="bi bi-person-fill text-lilis-purple fs-3"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-1">{{ usuario.nombre }}</h5>
+                            <p class="text-muted mb-0">{{ usuario.correo }}</p>
+                            <small class="badge bg-secondary">{{ usuario.id_rol.nombre }}</small>
+                        </div>
+                    </div>
+
+                    <!-- Warning Text -->
+                    <div class="alert alert-danger">
+                        <h6 class="alert-heading">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            ¡Advertencia!
+                        </h6>
+                        <p class="mb-0">
+                            Esta acción no se puede deshacer. Toda la información asociada a este usuario será eliminada permanentemente del sistema.
+                        </p>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex gap-3">
+                        <form method="post" class="flex-fill">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger w-100">
+                                <i class="bi bi-trash me-2"></i>
+                                Sí, Eliminar Usuario
+                            </button>
+                        </form>
+                        <a href="{% url 'usuarios:lista_usuarios' %}" class="btn btn-outline-secondary flex-fill">
+                            <i class="bi bi-x-circle me-2"></i>
+                            Cancelar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

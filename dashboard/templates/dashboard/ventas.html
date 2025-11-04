@@ -1,77 +1,296 @@
 {% extends 'dashboard/base.html' %}
+{% load static %}
 
-{% block title %}Ventas - Dulcería Lilis{% endblock %}
+{% block title %}Gestión de Ventas - Dulcería Lilis{% endblock %}
+
+{% block extra_css %}
+<style>
+    .sale-card {
+        border-left: 4px solid var(--lilis-green);
+        transition: all 0.3s ease;
+    }
+    
+    .sale-card:hover {
+        box-shadow: 0 4px 12px rgba(56, 161, 105, 0.15);
+        transform: translateY(-2px);
+    }
+    
+    .status-badge {
+        padding: 0.375rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .status-completed { background: var(--lilis-green-light); color: var(--lilis-green-dark); }
+    .status-pending { background: var(--lilis-yellow-light); color: var(--lilis-yellow-dark); }
+    .status-cancelled { background: var(--lilis-red-light); color: var(--lilis-red-dark); }
+    
+    .quick-stats {
+        background: linear-gradient(135deg, var(--lilis-green), var(--lilis-green-dark));
+        color: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<nav class="nav-tabs">
-    <a href="{% url 'dashboard:home' %}" class="nav-tab">
-        🏠 Dashboard
-    </a>
-    <a href="{% url 'dashboard:productos' %}" class="nav-tab">
-        📦 Productos
-    </a>
-    <a href="{% url 'dashboard:inventarios' %}" class="nav-tab">
-        📋 Inventarios
-    </a>
-    <a href="{% url 'dashboard:proveedores' %}" class="nav-tab">
-        🏢 Proveedores
-    </a>
-    <a href="{% url 'dashboard:ventas' %}" class="nav-tab active">
-        💰 Ventas
-    </a>
-</nav>
-
-<div class="card">
-    <div class="card-title">
-        <span class="icon">💰</span>
-        Reporte de Ventas
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="text-dark fw-bold mb-1">
+                <i class="bi bi-currency-dollar text-lilis-green me-2"></i>
+                Gestión de Ventas
+            </h2>
+            <p class="text-muted mb-0">Control y seguimiento de transacciones de venta</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-success" onclick="newSale()">
+                <i class="bi bi-plus-circle me-2"></i>
+                Nueva Venta
+            </button>
+            <button class="btn btn-lilis-primary" onclick="generateSalesReport()">
+                <i class="bi bi-file-earmark-text me-2"></i>
+                Reporte
+            </button>
+        </div>
     </div>
     
-    <div class="alert alert-info">
-        <strong>Información:</strong> Esta sección muestra datos ficticios de ventas para demostración.
+    <!-- Quick Stats -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="quick-stats text-center">
+                <div class="fs-2 fw-bold mb-1">S/ 15,450</div>
+                <div class="opacity-75">
+                    <i class="bi bi-currency-dollar me-1"></i>
+                    Ventas del Día
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="lilis-card">
+                <div class="lilis-card-body text-center">
+                    <div class="fs-2 fw-bold text-lilis-green mb-1">{{ ventas_completadas|default:12 }}</div>
+                    <div class="text-muted">
+                        <i class="bi bi-check-circle me-1"></i>
+                        Completadas
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="lilis-card">
+                <div class="lilis-card-body text-center">
+                    <div class="fs-2 fw-bold text-lilis-yellow mb-1">{{ ventas_pendientes|default:3 }}</div>
+                    <div class="text-muted">
+                        <i class="bi bi-clock me-1"></i>
+                        Pendientes
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="lilis-card">
+                <div class="lilis-card-body text-center">
+                    <div class="fs-2 fw-bold text-lilis-blue mb-1">{{ total_ventas|default:15 }}</div>
+                    <div class="text-muted">
+                        <i class="bi bi-graph-up me-1"></i>
+                        Total Ventas
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <div style="margin-bottom: 1rem;">
-        <span style="color: #999; font-size: 0.9rem;">Funcionalidad en desarrollo</span>
-    </div>
-
-    <table class="table">
-        <thead>
-            <tr>
-                <th>ID Venta</th>
-                <th>Fecha</th>
-                <th>Cliente</th>
-                <th>Total</th>
-                <th>Estado</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for venta in ventas %}
-            <tr>
-                <td>#{{ venta.id }}</td>
-                <td>{{ venta.fecha }}</td>
-                <td><strong>{{ venta.cliente }}</strong></td>
-                <td>${{ venta.total|floatformat:0 }}</td>
-                <td>
-                    {% if venta.estado == 'Completada' %}
-                    <span style="background: #28a745; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem;">
-                        {{ venta.estado }}
-                    </span>
-                    {% else %}
-                    <span style="background: #ffc107; color: #212529; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem;">
-                        {{ venta.estado }}
-                    </span>
-                    {% endif %}
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="5" style="text-align: center; color: #999; padding: 2rem;">
-                    No hay ventas registradas
-                </td>
-            </tr>
+    
+    <!-- Alert Container -->
+    <div class="alert-container mb-3">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="lilis-alert lilis-alert-{{ message.tags|default:'info' }}">
+                    {{ message }}
+                </div>
             {% endfor %}
-        </tbody>
-    </table>
+        {% endif %}
+    </div>
+    
+    <!-- Filters Card -->
+    <div class="lilis-card mb-4">
+        <div class="lilis-card-body">
+            <h5 class="card-title mb-3">
+                <i class="bi bi-funnel me-2"></i>
+                Filtros de búsqueda
+            </h5>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <input type="date" class="lilis-form-control" id="dateFrom" placeholder="Fecha desde">
+                </div>
+                <div class="col-md-3">
+                    <input type="date" class="lilis-form-control" id="dateTo" placeholder="Fecha hasta">
+                </div>
+                <div class="col-md-2">
+                    <select class="lilis-form-control" id="filterStatus">
+                        <option value="">Todos los estados</option>
+                        <option value="completada">Completada</option>
+                        <option value="pendiente">Pendiente</option>
+                        <option value="cancelada">Cancelada</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-lilis-primary w-100" onclick="filterSales()">
+                        <i class="bi bi-search me-1"></i>
+                        Filtrar
+                    </button>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-outline-success w-100" onclick="exportSalesToExcel()">
+                        <i class="bi bi-file-excel me-1"></i>
+                        Exportar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sales Table -->
+    <div class="lilis-card">
+        <div class="lilis-card-header d-flex justify-content-between align-items-center">
+            <h5 class="lilis-card-title mb-0">
+                <i class="bi bi-list me-2"></i>
+                Lista de Ventas
+            </h5>
+            <span class="badge bg-secondary" id="salesCount">{{ ventas.count|default:0 }} ventas</span>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="table table-hover mb-0" id="salesTable">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">ID Venta</th>
+                        <th scope="col">Fecha</th>
+                        <th scope="col">Cliente</th>
+                        <th scope="col">Total</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for venta in ventas %}
+                    <tr data-sale-id="{{ venta.id }}">
+                        <td>
+                            <strong>#{{ venta.id|stringformat:"04d" }}</strong>
+                        </td>
+                        <td>{{ venta.fecha|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            <strong>{{ venta.cliente }}</strong>
+                        </td>
+                        <td>
+                            <span class="fw-bold text-success">S/ {{ venta.total|floatformat:2 }}</span>
+                        </td>
+                        <td>
+                            {% if venta.estado == 'Completada' %}
+                                <span class="status-badge status-completed">Completada</span>
+                            {% elif venta.estado == 'Pendiente' %}
+                                <span class="status-badge status-pending">Pendiente</span>
+                            {% else %}
+                                <span class="status-badge status-cancelled">Cancelada</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                <button class="btn btn-outline-primary btn-sm" onclick="viewSale('{{ venta.id }}')" title="Ver detalles">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                {% if venta.estado == 'Pendiente' %}
+                                <button class="btn btn-outline-success btn-sm" onclick="completeSale('{{ venta.id }}')" title="Completar">
+                                    <i class="bi bi-check-circle"></i>
+                                </button>
+                                <button class="btn btn-outline-danger btn-sm" onclick="cancelSale('{{ venta.id }}')" title="Cancelar">
+                                    <i class="bi bi-x-circle"></i>
+                                </button>
+                                {% endif %}
+                                <button class="btn btn-outline-info btn-sm" onclick="printReceipt('{{ venta.id }}')" title="Imprimir">
+                                    <i class="bi bi-printer"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5">
+                            <div class="text-muted">
+                                <i class="bi bi-receipt display-4 d-block mb-3" style="color: var(--lilis-gray-300);"></i>
+                                <h5 class="mb-3">No se encontraron ventas</h5>
+                                <p class="mb-3">Comienza registrando tu primera venta</p>
+                                <button class="btn btn-lilis-primary" onclick="newSale()">
+                                    <i class="bi bi-plus-circle me-2"></i>
+                                    Nueva Venta
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Sales Management Functions
+    function newSale() {
+        LilisSystem.showAlert('Abriendo formulario de nueva venta...', 'info');
+        // Redirigir a formulario de venta o abrir modal
+    }
+    
+    function viewSale(saleId) {
+        LilisSystem.showAlert(`Viendo detalles de la venta ${saleId}`, 'info');
+    }
+    
+    function completeSale(saleId) {
+        if (confirm('¿Confirmar que la venta ha sido completada?')) {
+            LilisSystem.showAlert('Venta marcada como completada', 'success');
+            // Actualizar estado via AJAX
+            location.reload();
+        }
+    }
+    
+    function cancelSale(saleId) {
+        if (confirm('¿Estás seguro de que deseas cancelar esta venta?')) {
+            LilisSystem.showAlert('Venta cancelada', 'warning');
+            // Actualizar estado via AJAX
+            location.reload();
+        }
+    }
+    
+    function printReceipt(saleId) {
+        LilisSystem.showAlert('Generando recibo para imprimir...', 'info');
+        // Generar e imprimir recibo
+    }
+    
+    function filterSales() {
+        const dateFrom = document.getElementById('dateFrom').value;
+        const dateTo = document.getElementById('dateTo').value;
+        const status = document.getElementById('filterStatus').value;
+        
+        LilisSystem.showAlert('Filtrando ventas...', 'info');
+        // Implementar filtrado
+    }
+    
+    function exportSalesToExcel() {
+        LilisSystem.showAlert('Exportando ventas a Excel...', 'info');
+    }
+    
+    function generateSalesReport() {
+        LilisSystem.showAlert('Generando reporte de ventas...', 'info');
+    }
+    
+    // Event Listeners
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Sales management loaded');
+    });
+</script>
 {% endblock %}

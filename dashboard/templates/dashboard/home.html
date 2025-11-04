@@ -1,74 +1,497 @@
 {% extends 'dashboard/base.html' %}
+{% load static %}
 
 {% block title %}Dashboard - Dulcería Lilis{% endblock %}
 
+{% block extra_css %}
+<style>
+    .dashboard-welcome {
+        background: linear-gradient(135deg, var(--lilis-blue), var(--lilis-red));
+        color: white;
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .quick-action-card {
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        height: 100%;
+    }
+    
+    .quick-action-card:hover {
+        border-color: var(--lilis-blue);
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(79, 129, 247, 0.15);
+    }
+    
+    .quick-action-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        margin-bottom: 1rem;
+    }
+    
+    .recent-activity {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+    
+    .activity-item {
+        border-left: 3px solid var(--lilis-blue);
+        padding-left: 1rem;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--lilis-gray-200);
+    }
+    
+    .activity-item:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+    }
+    
+    .chart-container {
+        position: relative;
+        height: 300px;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="stats-grid">
-    <div class="stat-card">
-        <div class="stat-number">{{ productos_count }}</div>
-        <div class="stat-label">📦 Productos</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-number">{{ inventarios_count }}</div>
-        <div class="stat-label">📋 Inventarios</div>
-    </div>
-    {% if user.is_superuser or user.id_rol.nombre == 'Administrador' %}
-    <div class="stat-card">
-        <div class="stat-number">{{ proveedores_count }}</div>
-        <div class="stat-label">🏢 Proveedores</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-number">{{ ventas_count }}</div>
-        <div class="stat-label">💰 Ventas</div>
-    </div>
-    {% endif %}
-</div>
-
-<nav class="nav-tabs">
-    <a href="{% url 'dashboard:productos' %}" class="nav-tab active">
-        📦 Productos
-    </a>
-    <a href="{% url 'dashboard:inventarios' %}" class="nav-tab">
-        📋 Inventarios
-    </a>
-    {% if user.is_superuser or user.id_rol.nombre == 'Administrador' %}
-    <a href="{% url 'dashboard:proveedores' %}" class="nav-tab">
-        🏢 Proveedores
-    </a>
-    <a href="{% url 'dashboard:ventas' %}" class="nav-tab">
-        💰 Ventas
-    </a>
-    {% endif %}
-</nav>
-
-<div class="card">
-    <div class="card-title">
-        <span class="icon">📊</span>
-        Resumen del Sistema
+<div class="container-fluid">
+    <!-- Welcome Section -->
+    <div class="dashboard-welcome">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="fw-bold mb-2">¡Bienvenido, {{ user.first_name|default:user.username }}!</h1>
+                <p class="mb-0 opacity-90">
+                    Gestiona eficientemente tu dulcería con nuestro sistema integral
+                </p>
+            </div>
+            <div class="col-md-4 text-end">
+                <div class="fs-6 opacity-75">{{ today|date:"l, j \d\e F \d\e Y" }}</div>
+                <div class="fs-5 fw-bold">{{ now|time:"H:i" }}</div>
+            </div>
+        </div>
     </div>
     
-    {% if user.is_superuser or user.id_rol.nombre == 'Administrador' %}
-    <div class="alert alert-info">
-        <strong>Administrador:</strong> Tienes acceso completo a todas las funcionalidades del sistema.
+    <!-- Stats Overview -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="lilis-card text-center">
+                <div class="lilis-card-body">
+                    <div class="fs-2 fw-bold text-lilis-blue mb-2">{{ productos_count|default:0 }}</div>
+                    <div class="text-muted">
+                        <i class="bi bi-box-seam me-2"></i>
+                        Productos Registrados
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="lilis-card text-center">
+                <div class="lilis-card-body">
+                    <div class="fs-2 fw-bold text-lilis-green mb-2">{{ inventarios_count|default:0 }}</div>
+                    <div class="text-muted">
+                        <i class="bi bi-clipboard-check me-2"></i>
+                        Items en Inventario
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        {% if user.is_superuser or user.id_rol.nombre == 'Administrador' %}
+        <div class="col-md-3">
+            <div class="lilis-card text-center">
+                <div class="lilis-card-body">
+                    <div class="fs-2 fw-bold text-lilis-yellow mb-2">{{ proveedores_count|default:0 }}</div>
+                    <div class="text-muted">
+                        <i class="bi bi-building me-2"></i>
+                        Proveedores Activos
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="lilis-card text-center">
+                <div class="lilis-card-body">
+                    <div class="fs-2 fw-bold text-lilis-red mb-2">{{ ventas_count|default:0 }}</div>
+                    <div class="text-muted">
+                        <i class="bi bi-currency-dollar me-2"></i>
+                        Ventas del Mes
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
-    {% elif user.id_rol.nombre == 'Bodeguero' %}
-    <div class="alert alert-info">
-        <strong>Bodeguero:</strong> Puedes gestionar productos e inventarios. Acceso limitado a otras secciones.
+    
+    <!-- Quick Actions -->
+    <div class="row g-4 mb-4">
+        <div class="col-12">
+            <h3 class="fw-bold text-dark mb-3">
+                <i class="bi bi-lightning-fill text-lilis-blue me-2"></i>
+                Acciones Rápidas
+            </h3>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="lilis-card quick-action-card text-center" data-url="{% url 'productos:form_producto' %}">
+                <div class="lilis-card-body">
+                    <div class="quick-action-icon bg-primary-light text-primary mx-auto">
+                        <i class="bi bi-plus-circle-fill"></i>
+                    </div>
+                    <h6 class="fw-bold">Agregar Producto</h6>
+                    <p class="text-muted small mb-0">Registra nuevos productos en el catálogo</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="lilis-card quick-action-card text-center" data-url="{% url 'dashboard:inventarios' %}">
+                <div class="lilis-card-body">
+                    <div class="quick-action-icon bg-success-light text-success mx-auto">
+                        <i class="bi bi-arrow-down-circle-fill"></i>
+                    </div>
+                    <h6 class="fw-bold">Entrada de Stock</h6>
+                    <p class="text-muted small mb-0">Registra nuevas existencias</p>
+                </div>
+            </div>
+        </div>
+        
+        {% if user.is_superuser or user.id_rol.nombre == 'Administrador' %}
+        <div class="col-md-3">
+            <div class="lilis-card quick-action-card text-center" onclick="showProviderModal()">
+                <div class="lilis-card-body">
+                    <div class="quick-action-icon bg-warning-light text-warning mx-auto">
+                        <i class="bi bi-building-fill-add"></i>
+                    </div>
+                    <h6 class="fw-bold">Nuevo Proveedor</h6>
+                    <p class="text-muted small mb-0">Añade un nuevo proveedor</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="lilis-card quick-action-card text-center" data-url="{% url 'dashboard:ventas' %}">
+                <div class="lilis-card-body">
+                    <div class="quick-action-icon bg-info-light text-info mx-auto">
+                        <i class="bi bi-receipt-cutoff"></i>
+                    </div>
+                    <h6 class="fw-bold">Nueva Venta</h6>
+                    <p class="text-muted small mb-0">Procesa una nueva venta</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Additional Quick Actions for Administrators -->
+    {% if user.is_superuser or user.id_rol.nombre == 'Administrador' %}
+    <div class="row g-4 mb-4">
+        <div class="col-12">
+            <h4 class="fw-bold text-dark mb-3">
+                <i class="bi bi-gear-fill text-lilis-green me-2"></i>
+                Administración del Sistema
+            </h4>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="lilis-card quick-action-card text-center" data-url="{% url 'usuarios:agregar_usuario' %}">
+                <div class="lilis-card-body">
+                    <div class="quick-action-icon bg-success-light text-success mx-auto">
+                        <i class="bi bi-person-plus-fill"></i>
+                    </div>
+                    <h6 class="fw-bold">Nuevo Usuario</h6>
+                    <p class="text-muted small mb-0">Crear cuenta de usuario del sistema</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="lilis-card quick-action-card text-center" data-url="{% url 'usuarios:lista_usuarios' %}">
+                <div class="lilis-card-body">
+                    <div class="quick-action-icon bg-primary-light text-primary mx-auto">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                    <h6 class="fw-bold">Gestionar Usuarios</h6>
+                    <p class="text-muted small mb-0">Ver y editar usuarios del sistema</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="lilis-card quick-action-card text-center" data-url="/roles/">
+                <div class="lilis-card-body">
+                    <div class="quick-action-icon bg-warning-light text-warning mx-auto">
+                        <i class="bi bi-shield-fill-check"></i>
+                    </div>
+                    <h6 class="fw-bold">Gestionar Roles</h6>
+                    <p class="text-muted small mb-0">Configurar permisos y roles</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="lilis-card quick-action-card text-center" onclick="showSystemConfigModal()">
+                <div class="lilis-card-body">
+                    <div class="quick-action-icon bg-danger-light text-danger mx-auto">
+                        <i class="bi bi-gear-wide-connected"></i>
+                    </div>
+                    <h6 class="fw-bold">Configuración</h6>
+                    <p class="text-muted small mb-0">Ajustes del sistema</p>
+                </div>
+            </div>
+        </div>
     </div>
     {% endif %}
-
-    <p>Bienvenido al sistema de gestión de Dulcería Lilis. Desde aquí puedes acceder a todas las funcionalidades disponibles según tu rol.</p>
+    </div>
     
-    <div style="margin-top: 1rem;">
-        <h3>Funcionalidades disponibles:</h3>
-        <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
-            <li><strong>Productos:</strong> Gestionar el catálogo de productos</li>
-            <li><strong>Inventarios:</strong> Controlar el stock y ubicaciones</li>
-            {% if user.is_superuser or user.id_rol.nombre == 'Administrador' %}
-            <li><strong>Proveedores:</strong> Administrar información de proveedores</li>
-            <li><strong>Ventas:</strong> Consultar reportes de ventas</li>
-            {% endif %}
-        </ul>
+    <div class="row g-4">
+        <!-- Recent Activity -->
+        <div class="col-md-6">
+            <div class="lilis-card h-100">
+                <div class="lilis-card-header">
+                    <h5 class="lilis-card-title mb-0">
+                        <i class="bi bi-clock-history text-lilis-blue me-2"></i>
+                        Actividad Reciente
+                    </h5>
+                </div>
+                <div class="lilis-card-body">
+                    <div class="recent-activity">
+                        <div class="activity-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="mb-1">Producto agregado</h6>
+                                    <p class="text-muted small mb-1">Se agregó "Chocolates Premium" al catálogo</p>
+                                    <small class="text-muted">Hace 2 horas</small>
+                                </div>
+                                <i class="bi bi-plus-circle text-success"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="activity-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="mb-1">Entrada de inventario</h6>
+                                    <p class="text-muted small mb-1">Stock actualizado para "Caramelos de Menta"</p>
+                                    <small class="text-muted">Hace 4 horas</small>
+                                </div>
+                                <i class="bi bi-arrow-down-circle text-primary"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="activity-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="mb-1">Nuevo proveedor</h6>
+                                    <p class="text-muted small mb-1">Se registró "Dulces SA" como proveedor</p>
+                                    <small class="text-muted">Ayer</small>
+                                </div>
+                                <i class="bi bi-building text-warning"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="activity-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="mb-1">Venta realizada</h6>
+                                    <p class="text-muted small mb-1">Venta por S/ 45.50 completada</p>
+                                    <small class="text-muted">Ayer</small>
+                                </div>
+                                <i class="bi bi-receipt text-info"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="lilis-card-footer">
+                    <button class="btn btn-outline-primary btn-sm w-100">Ver todas las actividades</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Stock Alerts -->
+        <div class="col-md-6">
+            <div class="lilis-card h-100">
+                <div class="lilis-card-header">
+                    <h5 class="lilis-card-title mb-0">
+                        <i class="bi bi-exclamation-triangle text-warning me-2"></i>
+                        Alertas de Stock
+                    </h5>
+                </div>
+                <div class="lilis-card-body">
+                    <div class="alert lilis-alert-warning">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-exclamation-triangle me-3 fs-4"></i>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">Stock Bajo Detectado</h6>
+                                <p class="mb-2">3 productos requieren reabastecimiento</p>
+                                <button class="btn btn-warning btn-sm" data-url="{% url 'dashboard:inventarios' %}?tab=alerts">
+                                    Ver detalles
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item px-0">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">Chocolates Premium</h6>
+                                    <small class="text-muted">Stock: 5 unidades (Mín: 20)</small>
+                                </div>
+                                <span class="badge bg-warning">Bajo</span>
+                            </div>
+                        </div>
+                        
+                        <div class="list-group-item px-0">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">Galletas Oreo</h6>
+                                    <small class="text-muted">Stock: 0 unidades (Mín: 15)</small>
+                                </div>
+                                <span class="badge bg-danger">Agotado</span>
+                            </div>
+                        </div>
+                        
+                        <div class="list-group-item px-0">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">Caramelos Mix</h6>
+                                    <small class="text-muted">Stock: 8 unidades (Mín: 25)</small>
+                                </div>
+                                <span class="badge bg-warning">Bajo</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="lilis-card-footer">
+                    <button class="btn btn-outline-warning btn-sm w-100" data-url="{% url 'dashboard:inventarios' %}">
+                        Gestionar inventario
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Additional Dashboard Row -->
+    <div class="row g-4 mt-2">
+        <!-- Sales Summary -->
+        <div class="col-md-8">
+            <div class="lilis-card">
+                <div class="lilis-card-header">
+                    <h5 class="lilis-card-title mb-0">
+                        <i class="bi bi-graph-up text-success me-2"></i>
+                        Resumen de Ventas (Últimos 7 días)
+                    </h5>
+                </div>
+                <div class="lilis-card-body">
+                    <div class="chart-container">
+                        <div class="d-flex align-items-center justify-content-center h-100 text-muted">
+                            <div class="text-center">
+                                <i class="bi bi-bar-chart display-4 mb-3"></i>
+                                <p>Gráfico de ventas</p>
+                                <small>Funcionalidad en desarrollo</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Top Products -->
+        <div class="col-md-4">
+            <div class="lilis-card h-100">
+                <div class="lilis-card-header">
+                    <h5 class="lilis-card-title mb-0">
+                        <i class="bi bi-star text-lilis-yellow me-2"></i>
+                        Productos Top
+                    </h5>
+                </div>
+                <div class="lilis-card-body">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">Chocolates Premium</h6>
+                                <small class="text-muted">124 unidades vendidas</small>
+                            </div>
+                            <span class="badge bg-primary rounded-pill">1</span>
+                        </div>
+                        
+                        <div class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">Caramelos Mix</h6>
+                                <small class="text-muted">89 unidades vendidas</small>
+                            </div>
+                            <span class="badge bg-secondary rounded-pill">2</span>
+                        </div>
+                        
+                        <div class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">Galletas Oreo</h6>
+                                <small class="text-muted">67 unidades vendidas</small>
+                            </div>
+                            <span class="badge bg-warning rounded-pill">3</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function showProviderModal() {
+        window.location.href = '{% url "dashboard:proveedores" %}';
+    }
+    
+    // Update time every minute
+    function updateTime() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('es-PE', { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+        });
+        
+        const timeElement = document.querySelector('.dashboard-welcome .fs-5');
+        if (timeElement) {
+            timeElement.textContent = timeString;
+        }
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        // Update time every minute
+        setInterval(updateTime, 60000);
+        
+        // Add hover effects to quick action cards
+        const quickActionCards = document.querySelectorAll('.quick-action-card');
+        quickActionCards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+        
+        // Agregar event listeners para las tarjetas de acción rápida
+        document.querySelectorAll('.quick-action-card[data-url], button[data-url]').forEach(element => {
+            element.addEventListener('click', function() {
+                window.location.href = this.dataset.url;
+            });
+        });
+        
+        console.log('Dashboard loaded successfully');
+    });
+</script>
 {% endblock %}

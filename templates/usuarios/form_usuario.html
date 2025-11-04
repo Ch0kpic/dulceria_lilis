@@ -1,0 +1,529 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - Dulcería Lilis{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container {
+        background: white;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+    }
+    
+    .form-header {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-bottom: 1px solid #e9ecef;
+        border-radius: 8px 8px 0 0;
+    }
+    
+    .users-list-container {
+        background: white;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+        max-height: 600px;
+    }
+    
+    .users-list-header {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-bottom: 1px solid #e9ecef;
+        border-radius: 8px 8px 0 0;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+    
+    .users-list-body {
+        max-height: 500px;
+        overflow-y: auto;
+    }
+    
+    .user-item {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #f0f0f0;
+        display: flex;
+        justify-content: between;
+        align-items: center;
+    }
+    
+    .user-item:last-child {
+        border-bottom: none;
+    }
+    
+    .user-info {
+        flex-grow: 1;
+    }
+    
+    .user-name {
+        font-weight: 600;
+        color: #333;
+        margin: 0;
+        font-size: 0.95rem;
+    }
+    
+    .user-email {
+        color: #666;
+        margin: 0;
+        font-size: 0.85rem;
+    }
+    
+    .user-role {
+        background: #e3f2fd;
+        color: #1976d2;
+        padding: 0.25rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        margin-right: 0.5rem;
+    }
+    
+    .user-status {
+        padding: 0.25rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        margin-right: 0.5rem;
+    }
+    
+    .status-active {
+        background: #e8f5e8;
+        color: #2e7d32;
+    }
+    
+    .status-inactive {
+        background: #ffebee;
+        color: #c62828;
+    }
+    
+    .btn-actions {
+        display: flex;
+        gap: 0.25rem;
+    }
+    
+    .btn-action {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+        border-radius: 4px;
+        border: 1px solid;
+        background: white;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .btn-edit {
+        color: #1976d2;
+        border-color: #1976d2;
+    }
+    
+    .btn-edit:hover {
+        background: #1976d2;
+        color: white;
+    }
+    
+    .btn-delete {
+        color: #d32f2f;
+        border-color: #d32f2f;
+    }
+    
+    .btn-delete:hover {
+        background: #d32f2f;
+        color: white;
+    }
+    
+    .export-btn {
+        background: #4caf50;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        cursor: pointer;
+    }
+    
+    .form-field {
+        margin-bottom: 1rem;
+    }
+    
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #333;
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+    
+    .form-input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 0.9rem;
+    }
+    
+    .form-input:focus {
+        outline: none;
+        border-color: #1976d2;
+        box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+    }
+    
+    .form-select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        background: white;
+    }
+    
+    .form-checkbox {
+        margin-right: 0.5rem;
+    }
+    
+    .btn-primary {
+        background: #1976d2;
+        color: white;
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        margin-right: 0.5rem;
+    }
+    
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        cursor: pointer;
+    }
+    
+    .search-container {
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .search-input {
+        flex-grow: 1;
+        padding: 0.5rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 0.85rem;
+    }
+    
+    .filter-select {
+        padding: 0.5rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 0.85rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <!-- Formulario de Usuario (Lado Izquierdo) -->
+        <div class="col-md-6">
+            <div class="form-container">
+                <div class="form-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-person-plus me-2"></i>
+                        Formulario de Usuario
+                    </h5>
+                </div>
+                
+                <div class="p-4">
+                    <!-- Alert Container -->
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post" id="userForm">
+                        {% csrf_token %}
+                        
+                        <div class="form-field">
+                            <label class="form-label">Nombre</label>
+                            {{ form.nombre }}
+                            {% if form.nombre.errors %}
+                                <div class="text-danger small mt-1">{{ form.nombre.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-field">
+                            <label class="form-label">Email</label>
+                            {{ form.correo }}
+                            {% if form.correo.errors %}
+                                <div class="text-danger small mt-1">{{ form.correo.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-field">
+                            <label class="form-label">Teléfono</label>
+                            <input type="text" class="form-input" name="telefono" placeholder="Ingrese teléfono">
+                        </div>
+
+                        <div class="form-field">
+                            <label class="form-label">Contraseña</label>
+                            {{ form.password }}
+                            {% if form.password.errors %}
+                                <div class="text-danger small mt-1">{{ form.password.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-field">
+                            <label class="form-label">Confirmar Contraseña</label>
+                            {{ form.confirm_password }}
+                            {% if form.confirm_password.errors %}
+                                <div class="text-danger small mt-1">{{ form.confirm_password.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-field">
+                            <label class="form-label">Rol</label>
+                            {{ form.id_rol }}
+                            {% if form.id_rol.errors %}
+                                <div class="text-danger small mt-1">{{ form.id_rol.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-field">
+                            <label>
+                                <input type="checkbox" class="form-checkbox" name="is_active" {% if form.is_active.value %}checked{% endif %}>
+                                Estado y acceso
+                            </label>
+                        </div>
+
+                        <!-- Error general del formulario -->
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {{ form.non_field_errors }}
+                            </div>
+                        {% endif %}
+
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="submit" class="btn-primary">Guardar</button>
+                            <button type="button" class="btn-secondary" onclick="clearForm()">Limpiar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de Usuarios (Lado Derecho) -->
+        <div class="col-md-6">
+            <div class="users-list-container">
+                <div class="users-list-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Usuarios</h5>
+                    <button class="export-btn">
+                        <i class="bi bi-file-excel me-1"></i>
+                        Exportar a Excel
+                    </button>
+                </div>
+                
+                <div class="p-3">
+                    <div class="search-container">
+                        <input type="text" class="search-input" placeholder="Buscar por nombre...">
+                        <select class="filter-select">
+                            <option>Rol: todos</option>
+                            <option>ADMIN</option>
+                            <option>AUDITOR</option>
+                            <option>OPERADOR</option>
+                        </select>
+                        <select class="filter-select">
+                            <option>Estado: todos</option>
+                            <option>Activo</option>
+                            <option>Inactivo</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="users-list-body" id="usersList">
+                    {% for usuario in usuarios %}
+                    <div class="user-item" data-user-id="{{ usuario.id_usuario }}">
+                        <div class="user-info">
+                            <div class="user-name">{{ usuario.nombre }}</div>
+                            <div class="user-email">{{ usuario.correo }}</div>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <span class="user-role">{{ usuario.id_rol.nombre|upper }}</span>
+                            <span class="user-status {% if usuario.is_active %}status-active{% else %}status-inactive{% endif %}">
+                                {% if usuario.is_active %}ACTIVO{% else %}INACTIVO{% endif %}
+                            </span>
+                            <div class="btn-actions">
+                                <button class="btn-action btn-edit" onclick="editUser('{{ usuario.id_usuario }}')">Editar</button>
+                                <button class="btn-action btn-delete" onclick="deleteUser('{{ usuario.id_usuario }}')">Eliminar</button>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="user-item text-center">
+                        <div class="text-muted">No hay usuarios registrados</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function clearForm() {
+        document.getElementById('userForm').reset();
+    }
+    
+    function editUser(userId) {
+        window.location.href = `/usuarios/editar/${userId}/`;
+    }
+    
+    function deleteUser(userId) {
+        if (confirm('¿Estás seguro de que deseas eliminar este usuario?')) {
+            window.location.href = `/usuarios/eliminar/${userId}/`;
+        }
+    }
+    
+    function addUserToList(userData) {
+        const usersList = document.getElementById('usersList');
+        const userItem = document.createElement('div');
+        userItem.className = 'user-item';
+        userItem.setAttribute('data-user-id', userData.id);
+        
+        userItem.innerHTML = `
+            <div class="user-info">
+                <div class="user-name">${userData.nombre}</div>
+                <div class="user-email">${userData.correo}</div>
+            </div>
+            <div class="d-flex align-items-center">
+                <span class="user-role">${userData.rol.toUpperCase()}</span>
+                <span class="user-status ${userData.is_active ? 'status-active' : 'status-inactive'}">
+                    ${userData.is_active ? 'ACTIVO' : 'INACTIVO'}
+                </span>
+                <div class="btn-actions">
+                    <button class="btn-action btn-edit" onclick="editUser('${userData.id}')">Editar</button>
+                    <button class="btn-action btn-delete" onclick="deleteUser('${userData.id}')">Eliminar</button>
+                </div>
+            </div>
+        `;
+        
+        // Insertar al inicio de la lista
+        const firstChild = usersList.firstElementChild;
+        if (firstChild && firstChild.textContent.includes('No hay usuarios')) {
+            usersList.innerHTML = '';
+        }
+        usersList.insertBefore(userItem, usersList.firstChild);
+    }
+    
+    // Manejar el envío del formulario con AJAX
+    document.getElementById('userForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        fetch('{% url "usuarios:agregar_usuario" %}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': csrfToken
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Agregar usuario a la lista inmediatamente
+                addUserToList(data.user);
+                
+                // Limpiar formulario
+                this.reset();
+                
+                // Mostrar mensaje de éxito
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-success alert-dismissible fade show';
+                alertDiv.innerHTML = `
+                    Usuario "${data.user.nombre}" creado exitosamente.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                
+                const form = document.querySelector('.p-4');
+                form.insertBefore(alertDiv, form.firstChild);
+                
+                // Remover alerta después de 5 segundos
+                setTimeout(() => {
+                    if (alertDiv.parentNode) {
+                        alertDiv.remove();
+                    }
+                }, 5000);
+                
+            } else {
+                // Manejar errores
+                console.error('Error al crear usuario:', data.errors);
+                
+                // Mostrar mensaje de error
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+                alertDiv.innerHTML = `
+                    Error al crear el usuario. Por favor verifica los datos.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                
+                const form = document.querySelector('.p-4');
+                form.insertBefore(alertDiv, form.firstChild);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+            alertDiv.innerHTML = `
+                Error de conexión. Intenta nuevamente.
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            const form = document.querySelector('.p-4');
+            form.insertBefore(alertDiv, form.firstChild);
+        });
+    });
+    
+    // Filtros de búsqueda en tiempo real
+    document.querySelector('.search-input').addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        const userItems = document.querySelectorAll('.user-item');
+        
+        userItems.forEach(item => {
+            const userName = item.querySelector('.user-name')?.textContent.toLowerCase() || '';
+            const userEmail = item.querySelector('.user-email')?.textContent.toLowerCase() || '';
+            
+            if (userName.includes(searchTerm) || userEmail.includes(searchTerm)) {
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    });
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        // Auto-focus en el primer campo
+        const firstInput = document.querySelector('input[name="nombre"]');
+        if (firstInput) {
+            firstInput.focus();
+        }
+        
+        console.log('User form with real-time updates loaded');
+    });
+</script>
+{% endblock %}

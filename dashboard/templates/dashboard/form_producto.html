@@ -1,148 +1,324 @@
 {% extends 'dashboard/base.html' %}
+{% load static %}
 
-{% block title %}{{ titulo }} - Dulcería Lilis{% endblock %}
+{% block title %}{% if form.instance.pk %}Editar Producto{% else %}Agregar Producto{% endif %} - Dulcería Lilis{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-section {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        border-left: 4px solid var(--lilis-green);
+    }
+    
+    .form-header {
+        background: linear-gradient(135deg, var(--lilis-green), var(--lilis-green-dark));
+        color: white;
+        border-radius: 11px 11px 0 0;
+        margin: -1px -1px 0 -1px;
+    }
+    
+    .required-field::after {
+        content: " *";
+        color: var(--lilis-red);
+        font-weight: bold;
+    }
+    
+    .field-help {
+        font-size: 0.875rem;
+        color: var(--lilis-gray-600);
+        margin-top: 0.25rem;
+    }
+    
+    .price-input {
+        position: relative;
+    }
+    
+    .price-input::before {
+        content: "S/";
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--lilis-gray-600);
+        font-weight: 500;
+        z-index: 1;
+    }
+    
+    .price-input input {
+        padding-left: 35px;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<nav class="nav-tabs">
-    <a href="{% url 'dashboard:home' %}" class="nav-tab">
-        🏠 Dashboard
-    </a>
-    <a href="{% url 'dashboard:productos' %}" class="nav-tab">
-        📦 Productos
-    </a>
-    <a href="{% url 'dashboard:inventarios' %}" class="nav-tab">
-        📋 Inventarios
-    </a>
-    {% if user.is_superuser or user.id_rol.nombre == 'Administrador' %}
-    <a href="{% url 'dashboard:proveedores' %}" class="nav-tab">
-        🏢 Proveedores
-    </a>
-    <a href="{% url 'dashboard:ventas' %}" class="nav-tab">
-        💰 Ventas
-    </a>
-    {% endif %}
-</nav>
-
-<div class="card">
-    <div class="card-title">
-        <span class="icon">{% if producto %}✏️{% else %}➕{% endif %}</span>
-        {{ titulo }}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="text-dark fw-bold mb-1">
+                <i class="bi bi-{% if form.instance.pk %}pencil-square{% else %}plus-circle{% endif %} text-lilis-green me-2"></i>
+                {% if form.instance.pk %}Editar Producto{% else %}Agregar Nuevo Producto{% endif %}
+            </h2>
+            <p class="text-muted mb-0">
+                {% if form.instance.pk %}
+                    Modifica la información del producto "{{ form.instance.nombre }}"
+                {% else %}
+                    Completa la información para registrar un nuevo producto
+                {% endif %}
+            </p>
+        </div>
+        <a href="{% url 'productos' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-2"></i>
+            Volver a Productos
+        </a>
     </div>
-    
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
-                {{ message }}
+
+    <!-- Alert Container -->
+    <div class="alert-container mb-3">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="lilis-alert lilis-alert-{{ message.tags|default:'info' }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- Form Container -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-6">
+            <div class="form-section">
+                <div class="form-header p-4">
+                    <h4 class="mb-0 d-flex align-items-center">
+                        <i class="bi bi-box-seam me-2"></i>
+                        Información del Producto
+                    </h4>
+                </div>
+                
+                <div class="p-4">
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Nombre del Producto -->
+                        <div class="mb-4">
+                            <label for="{{ form.nombre.id_for_label }}" class="lilis-form-label required-field">
+                                Nombre del Producto
+                            </label>
+                            {{ form.nombre }}
+                            {% if form.nombre.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.nombre.errors.0 }}
+                                </div>
+                            {% endif %}
+                            <div class="field-help">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Ingresa un nombre descriptivo y único para el producto
+                            </div>
+                        </div>
+
+                        <!-- Descripción -->
+                        <div class="mb-4">
+                            <label for="{{ form.descripcion.id_for_label }}" class="lilis-form-label">
+                                Descripción
+                            </label>
+                            {{ form.descripcion }}
+                            {% if form.descripcion.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.descripcion.errors.0 }}
+                                </div>
+                            {% endif %}
+                            <div class="field-help">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Descripción detallada del producto (opcional)
+                            </div>
+                        </div>
+
+                        <!-- Precio -->
+                        <div class="mb-4">
+                            <label for="{{ form.precio.id_for_label }}" class="lilis-form-label required-field">
+                                Precio de Venta
+                            </label>
+                            <div class="price-input">
+                                {{ form.precio }}
+                            </div>
+                            {% if form.precio.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.precio.errors.0 }}
+                                </div>
+                            {% endif %}
+                            <div class="field-help">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Precio en soles (S/). Ejemplo: 15.50
+                            </div>
+                        </div>
+
+                        <!-- Categoría -->
+                        {% if form.categoria %}
+                        <div class="mb-4">
+                            <label for="{{ form.categoria.id_for_label }}" class="lilis-form-label required-field">
+                                Categoría
+                            </label>
+                            {{ form.categoria }}
+                            {% if form.categoria.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.categoria.errors.0 }}
+                                </div>
+                            {% endif %}
+                            <div class="field-help">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Selecciona la categoría que mejor describe el producto
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Estado/Activo -->
+                        {% if form.activo %}
+                        <div class="mb-4">
+                            <div class="form-check form-switch">
+                                {{ form.activo }}
+                                <label class="form-check-label" for="{{ form.activo.id_for_label }}">
+                                    Producto Activo
+                                </label>
+                            </div>
+                            {% if form.activo.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.activo.errors.0 }}
+                                </div>
+                            {% endif %}
+                            <div class="field-help">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Los productos inactivos no aparecerán en las ventas
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Botones de Acción -->
+                        <div class="d-flex gap-3 pt-3 border-top">
+                            <button type="submit" class="btn btn-lilis-primary flex-fill">
+                                <i class="bi bi-{% if form.instance.pk %}check-circle{% else %}plus-circle{% endif %} me-2"></i>
+                                {% if form.instance.pk %}Actualizar Producto{% else %}Crear Producto{% endif %}
+                            </button>
+                            <a href="{% url 'productos' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle me-2"></i>
+                                Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
             </div>
-        {% endfor %}
-    {% endif %}
-
-    <form method="post" class="form-container">
-        {% csrf_token %}
-        
-        <div class="form-group">
-            <label for="{{ form.nombre.id_for_label }}">{{ form.nombre.label }}:</label>
-            {{ form.nombre }}
-            {% if form.nombre.errors %}
-                <div class="error-message">{{ form.nombre.errors.0 }}</div>
-            {% endif %}
         </div>
 
-        <div class="form-group">
-            <label for="{{ form.descripcion.id_for_label }}">{{ form.descripcion.label }}:</label>
-            {{ form.descripcion }}
-            {% if form.descripcion.errors %}
-                <div class="error-message">{{ form.descripcion.errors.0 }}</div>
-            {% endif %}
-        </div>
-
-        <div class="form-group">
-            <label for="{{ form.precio_referencia.id_for_label }}">{{ form.precio_referencia.label }}:</label>
-            <div style="position: relative;">
-                <span style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #666; font-weight: bold;">$</span>
-                {{ form.precio_referencia }}
+        <!-- Preview Card (si es edición) -->
+        {% if form.instance.pk %}
+        <div class="col-lg-4">
+            <div class="lilis-card sticky-top" style="top: 2rem;">
+                <div class="lilis-card-header">
+                    <h6 class="lilis-card-title mb-0">
+                        <i class="bi bi-eye me-2"></i>
+                        Vista Previa
+                    </h6>
+                </div>
+                <div class="lilis-card-body">
+                    <div class="text-center">
+                        <div class="bg-lilis-green-light rounded-3 p-4 mb-3">
+                            <i class="bi bi-box-seam display-4 text-lilis-green"></i>
+                        </div>
+                        <h5 class="fw-bold text-dark">{{ form.instance.nombre|default:"Nombre del Producto" }}</h5>
+                        <p class="text-muted small">{{ form.instance.descripcion|default:"Descripción del producto..." }}</p>
+                        <div class="badge bg-success fs-6 px-3 py-2">
+                            S/ {{ form.instance.precio|default:"0.00" }}
+                        </div>
+                    </div>
+                    
+                    <hr class="my-3">
+                    
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <div class="text-muted small">Estado</div>
+                            <div class="fw-bold text-{% if form.instance.activo %}success{% else %}danger{% endif %}">
+                                {% if form.instance.activo %}Activo{% else %}Inactivo{% endif %}
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-muted small">ID</div>
+                            <div class="fw-bold">#{{ form.instance.pk|default:"---" }}</div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            {% if form.precio_referencia.errors %}
-                <div class="error-message">{{ form.precio_referencia.errors.0 }}</div>
-            {% endif %}
         </div>
-
-        <div class="form-actions">
-            <button type="submit" class="btn btn-primary">
-                {% if producto %}💾 Actualizar Producto{% else %}➕ Agregar Producto{% endif %}
-            </button>
-            <a href="{% url 'dashboard:productos' %}" class="btn btn-secondary">❌ Cancelar</a>
-        </div>
-    </form>
+        {% endif %}
+    </div>
 </div>
+{% endblock %}
 
-<style>
-.form-container {
-    max-width: 600px;
-    margin: 0 auto;
-}
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Form validation
+        const forms = document.querySelectorAll('.needs-validation');
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
 
-.form-group {
-    margin-bottom: 1.5rem;
-}
+        // Price formatting
+        const priceInput = document.querySelector('input[name=precio]');
+        if (priceInput) {
+            priceInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/[^0-9.]/g, '');
+                const parts = value.split('.');
+                if (parts.length > 2) {
+                    value = parts[0] + '.' + parts.slice(1).join('');
+                }
+                if (parts[1] && parts[1].length > 2) {
+                    value = parts[0] + '.' + parts[1].substring(0, 2);
+                }
+                e.target.value = value;
+            });
+        }
 
-.form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-    color: #333;
-}
+        // Auto-focus first field
+        const firstInput = document.querySelector('input[name=nombre]');
+        if (firstInput) {
+            firstInput.focus();
+        }
 
-.form-input {
-    width: 100%;
-    padding: 12px 16px;
-    border: 2px solid #e1e5e9;
-    border-radius: 8px;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    background-color: #f8f9fa;
-}
+        // Preview updates (si es edición)
+        {% if form.instance.pk %}
+        const nameInput = document.querySelector('input[name=nombre]');
+        const descInput = document.querySelector('textarea[name=descripcion]');
+        const pricePreview = document.querySelector('input[name=precio]');
+        
+        function updatePreview() {
+            const previewName = document.querySelector('.lilis-card h5');
+            const previewDesc = document.querySelector('.lilis-card p');
+            const previewPrice = document.querySelector('.badge.bg-success');
+            
+            if (nameInput && previewName) {
+                previewName.textContent = nameInput.value || 'Nombre del Producto';
+            }
+            if (descInput && previewDesc) {
+                previewDesc.textContent = descInput.value || 'Descripción del producto...';
+            }
+            if (pricePreview && previewPrice) {
+                previewPrice.textContent = 'S/ ' + (pricePreview.value || '0.00');
+            }
+        }
+        
+        if (nameInput) nameInput.addEventListener('input', updatePreview);
+        if (descInput) descInput.addEventListener('input', updatePreview);
+        if (pricePreview) pricePreview.addEventListener('input', updatePreview);
+        {% endif %}
 
-.form-input:focus {
-    outline: none;
-    border-color: #667eea;
-    background-color: white;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-.form-input[type="number"] {
-    padding-left: 35px;
-}
-
-.form-actions {
-    display: flex;
-    gap: 1rem;
-    margin-top: 2rem;
-    justify-content: center;
-}
-
-.error-message {
-    color: #dc3545;
-    font-size: 0.875rem;
-    margin-top: 0.25rem;
-}
-
-.alert-success {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
-
-.alert-error {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
-
-@media (max-width: 768px) {
-    .form-actions {
-        flex-direction: column;
-    }
-}
-</style>
+        console.log('Product form loaded successfully');
+    });
+</script>
 {% endblock %}

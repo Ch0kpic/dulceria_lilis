@@ -1,150 +1,436 @@
 {% extends 'dashboard/base.html' %}
+{% load static %}
 
-{% block title %}{{ titulo }} - Dulcería Lilis{% endblock %}
+{% block title %}{% if form.instance.pk %}Editar Inventario{% else %}Agregar Inventario{% endif %} - Dulcería Lilis{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-section {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        border-left: 4px solid var(--lilis-blue);
+    }
+    
+    .form-header {
+        background: linear-gradient(135deg, var(--lilis-blue), var(--lilis-blue-dark));
+        color: white;
+        border-radius: 11px 11px 0 0;
+        margin: -1px -1px 0 -1px;
+    }
+    
+    .required-field::after {
+        content: " *";
+        color: var(--lilis-red);
+        font-weight: bold;
+    }
+    
+    .field-help {
+        font-size: 0.875rem;
+        color: var(--lilis-gray-600);
+        margin-top: 0.25rem;
+    }
+    
+    .stock-alert {
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        border-left: 4px solid;
+    }
+    
+    .stock-alert.low-stock {
+        background-color: #fef3cd;
+        border-color: #f0ad4e;
+        color: #8a6d3b;
+    }
+    
+    .stock-alert.out-of-stock {
+        background-color: #f8d7da;
+        border-color: #d9534f;
+        color: #721c24;
+    }
+    
+    .quantity-input {
+        position: relative;
+    }
+    
+    .quantity-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .quantity-btn {
+        width: 40px;
+        height: 40px;
+        border: 1px solid #dee2e6;
+        background: white;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .quantity-btn:hover {
+        background: var(--lilis-blue-light);
+        border-color: var(--lilis-blue);
+        color: var(--lilis-blue-dark);
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<nav class="nav-tabs">
-    <a href="{% url 'dashboard:home' %}" class="nav-tab">
-        🏠 Dashboard
-    </a>
-    <a href="{% url 'dashboard:productos' %}" class="nav-tab">
-        📦 Productos
-    </a>
-    <a href="{% url 'dashboard:inventarios' %}" class="nav-tab">
-        📋 Inventarios
-    </a>
-    {% if user.is_superuser or user.id_rol.nombre == 'Administrador' %}
-    <a href="{% url 'dashboard:proveedores' %}" class="nav-tab">
-        🏢 Proveedores
-    </a>
-    <a href="{% url 'dashboard:ventas' %}" class="nav-tab">
-        💰 Ventas
-    </a>
-    {% endif %}
-</nav>
-
-<div class="card">
-    <div class="card-title">
-        <span class="icon">{% if inventario %}✏️{% else %}➕{% endif %}</span>
-        {{ titulo }}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="text-dark fw-bold mb-1">
+                <i class="bi bi-{% if form.instance.pk %}pencil-square{% else %}plus-circle{% endif %} text-lilis-blue me-2"></i>
+                {% if form.instance.pk %}Editar Inventario{% else %}Agregar al Inventario{% endif %}
+            </h2>
+            <p class="text-muted mb-0">
+                {% if form.instance.pk %}
+                    Modifica la información del inventario para "{{ form.instance.producto.nombre }}"
+                {% else %}
+                    Registra un nuevo producto en el inventario
+                {% endif %}
+            </p>
+        </div>
+        <a href="{% url 'inventarios' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-2"></i>
+            Volver a Inventario
+        </a>
     </div>
-    
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
-                {{ message }}
+
+    <!-- Alert Container -->
+    <div class="alert-container mb-3">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="lilis-alert lilis-alert-{{ message.tags|default:'info' }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- Stock Alerts -->
+    {% if form.instance.pk %}
+        {% if form.instance.stock_actual <= 5 and form.instance.stock_actual > 0 %}
+            <div class="stock-alert low-stock">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <strong>Stock Bajo:</strong> Este producto tiene pocas unidades disponibles ({{ form.instance.stock_actual }} restantes).
             </div>
-        {% endfor %}
+        {% elif form.instance.stock_actual <= 0 %}
+            <div class="stock-alert out-of-stock">
+                <i class="bi bi-x-circle-fill me-2"></i>
+                <strong>Sin Stock:</strong> Este producto está agotado. Considera reabastecerlo pronto.
+            </div>
+        {% endif %}
     {% endif %}
 
-    <form method="post" class="form-container">
-        {% csrf_token %}
-        
-        <div class="form-group">
-            <label for="{{ form.id_producto.id_for_label }}">{{ form.id_producto.label }}:</label>
-            {{ form.id_producto }}
-            {% if form.id_producto.errors %}
-                <div class="error-message">{{ form.id_producto.errors.0 }}</div>
-            {% endif %}
-            {% if not inventario %}
-            <small style="color: #666; font-size: 0.875rem; margin-top: 0.25rem; display: block;">
-                Solo se muestran productos que aún no tienen inventario registrado.
-            </small>
-            {% endif %}
+    <!-- Form Container -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-6">
+            <div class="form-section">
+                <div class="form-header p-4">
+                    <h4 class="mb-0 d-flex align-items-center">
+                        <i class="bi bi-boxes me-2"></i>
+                        Información del Inventario
+                    </h4>
+                </div>
+                
+                <div class="p-4">
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Producto -->
+                        <div class="mb-4">
+                            <label for="{{ form.producto.id_for_label }}" class="lilis-form-label required-field">
+                                Producto
+                            </label>
+                            {{ form.producto }}
+                            {% if form.producto.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.producto.errors.0 }}
+                                </div>
+                            {% endif %}
+                            <div class="field-help">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Selecciona el producto para gestionar su inventario
+                            </div>
+                        </div>
+
+                        <!-- Stock Actual -->
+                        <div class="mb-4">
+                            <label for="{{ form.stock_actual.id_for_label }}" class="lilis-form-label required-field">
+                                Stock Actual
+                            </label>
+                            <div class="quantity-controls">
+                                <button type="button" class="quantity-btn" onclick="decreaseQuantity('{{ form.stock_actual.id_for_label }}')">
+                                    <i class="bi bi-dash"></i>
+                                </button>
+                                {{ form.stock_actual }}
+                                <button type="button" class="quantity-btn" onclick="increaseQuantity('{{ form.stock_actual.id_for_label }}')">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+                            </div>
+                            {% if form.stock_actual.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.stock_actual.errors.0 }}
+                                </div>
+                            {% endif %}
+                            <div class="field-help">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Cantidad actual disponible en inventario
+                            </div>
+                        </div>
+
+                        <!-- Stock Mínimo -->
+                        <div class="mb-4">
+                            <label for="{{ form.stock_minimo.id_for_label }}" class="lilis-form-label required-field">
+                                Stock Mínimo
+                            </label>
+                            {{ form.stock_minimo }}
+                            {% if form.stock_minimo.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.stock_minimo.errors.0 }}
+                                </div>
+                            {% endif %}
+                            <div class="field-help">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Cantidad mínima antes de requerir reabastecimiento
+                            </div>
+                        </div>
+
+                        <!-- Ubicación -->
+                        {% if form.ubicacion %}
+                        <div class="mb-4">
+                            <label for="{{ form.ubicacion.id_for_label }}" class="lilis-form-label">
+                                Ubicación
+                            </label>
+                            {{ form.ubicacion }}
+                            {% if form.ubicacion.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.ubicacion.errors.0 }}
+                                </div>
+                            {% endif %}
+                            <div class="field-help">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Ubicación física del producto (estante, almacén, etc.)
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Fecha de Última Actualización (solo lectura si es edición) -->
+                        {% if form.instance.pk %}
+                        <div class="mb-4">
+                            <label class="lilis-form-label">Última Actualización</label>
+                            <input type="text" class="lilis-form-control" 
+                                   value="{{ form.instance.fecha_actualizacion|date:'d/m/Y H:i' }}" 
+                                   readonly>
+                            <div class="field-help">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Fecha y hora de la última modificación del inventario
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Botones de Acción -->
+                        <div class="d-flex gap-3 pt-3 border-top">
+                            <button type="submit" class="btn btn-lilis-primary flex-fill">
+                                <i class="bi bi-{% if form.instance.pk %}check-circle{% else %}plus-circle{% endif %} me-2"></i>
+                                {% if form.instance.pk %}Actualizar Inventario{% else %}Agregar al Inventario{% endif %}
+                            </button>
+                            <a href="{% url 'inventarios' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle me-2"></i>
+                                Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
 
-        <div class="form-group">
-            <label for="{{ form.cantidad_actual.id_for_label }}">{{ form.cantidad_actual.label }}:</label>
-            {{ form.cantidad_actual }}
-            {% if form.cantidad_actual.errors %}
-                <div class="error-message">{{ form.cantidad_actual.errors.0 }}</div>
-            {% endif %}
-        </div>
+        <!-- Info Card -->
+        <div class="col-lg-4">
+            <div class="lilis-card sticky-top" style="top: 2rem;">
+                <div class="lilis-card-header">
+                    <h6 class="lilis-card-title mb-0">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Información del Stock
+                    </h6>
+                </div>
+                <div class="lilis-card-body">
+                    {% if form.instance.pk %}
+                    <!-- Producto actual -->
+                    <div class="text-center mb-3">
+                        <div class="bg-lilis-blue-light rounded-3 p-3 mb-2">
+                            <i class="bi bi-box-seam display-6 text-lilis-blue"></i>
+                        </div>
+                        <h6 class="fw-bold">{{ form.instance.producto.nombre }}</h6>
+                        <p class="text-muted small mb-0">{{ form.instance.producto.descripcion|default:"Sin descripción" }}</p>
+                    </div>
+                    
+                    <hr>
+                    
+                    <!-- Estadísticas -->
+                    <div class="row text-center mb-3">
+                        <div class="col-6">
+                            <div class="text-muted small">Stock Actual</div>
+                            <div class="fs-4 fw-bold text-{% if form.instance.stock_actual > form.instance.stock_minimo %}success{% elif form.instance.stock_actual > 0 %}warning{% else %}danger{% endif %}">
+                                {{ form.instance.stock_actual }}
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-muted small">Stock Mínimo</div>
+                            <div class="fs-4 fw-bold text-info">
+                                {{ form.instance.stock_minimo }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Estado del Stock -->
+                    <div class="alert {% if form.instance.stock_actual > form.instance.stock_minimo %}alert-success{% elif form.instance.stock_actual > 0 %}alert-warning{% else %}alert-danger{% endif %} p-2 text-center">
+                        {% if form.instance.stock_actual > form.instance.stock_minimo %}
+                            <i class="bi bi-check-circle me-1"></i> Stock Óptimo
+                        {% elif form.instance.stock_actual > 0 %}
+                            <i class="bi bi-exclamation-triangle me-1"></i> Stock Bajo
+                        {% else %}
+                            <i class="bi bi-x-circle me-1"></i> Sin Stock
+                        {% endif %}
+                    </div>
+                    {% else %}
+                    <!-- Nuevo inventario -->
+                    <div class="text-center text-muted">
+                        <i class="bi bi-plus-circle display-4 mb-3"></i>
+                        <h6>Nuevo Registro de Inventario</h6>
+                        <p class="small">Selecciona un producto y configura su stock inicial</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
 
-        <div class="form-group">
-            <label for="{{ form.ubicacion.id_for_label }}">{{ form.ubicacion.label }}:</label>
-            {{ form.ubicacion }}
-            {% if form.ubicacion.errors %}
-                <div class="error-message">{{ form.ubicacion.errors.0 }}</div>
-            {% endif %}
+            <!-- Tips Card -->
+            <div class="lilis-card mt-3">
+                <div class="lilis-card-header">
+                    <h6 class="lilis-card-title mb-0">
+                        <i class="bi bi-lightbulb me-2"></i>
+                        Consejos
+                    </h6>
+                </div>
+                <div class="lilis-card-body">
+                    <div class="small text-muted">
+                        <div class="d-flex mb-2">
+                            <i class="bi bi-check2-circle text-success me-2 mt-1"></i>
+                            <div>Mantén el stock actual actualizado para evitar desabastecimientos</div>
+                        </div>
+                        <div class="d-flex mb-2">
+                            <i class="bi bi-check2-circle text-success me-2 mt-1"></i>
+                            <div>Define un stock mínimo apropiado según la rotación del producto</div>
+                        </div>
+                        <div class="d-flex">
+                            <i class="bi bi-check2-circle text-success me-2 mt-1"></i>
+                            <div>Especifica la ubicación para encontrar rápidamente los productos</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <div class="form-actions">
-            <button type="submit" class="btn btn-primary">
-                {% if inventario %}💾 Actualizar Inventario{% else %}➕ Agregar Inventario{% endif %}
-            </button>
-            <a href="{% url 'dashboard:inventarios' %}" class="btn btn-secondary">❌ Cancelar</a>
-        </div>
-    </form>
+    </div>
 </div>
+{% endblock %}
 
-<style>
-.form-container {
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-.form-group {
-    margin-bottom: 1.5rem;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-    color: #333;
-}
-
-.form-input {
-    width: 100%;
-    padding: 12px 16px;
-    border: 2px solid #e1e5e9;
-    border-radius: 8px;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    background-color: #f8f9fa;
-}
-
-.form-input:focus {
-    outline: none;
-    border-color: #667eea;
-    background-color: white;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-.form-input select {
-    cursor: pointer;
-}
-
-.form-actions {
-    display: flex;
-    gap: 1rem;
-    margin-top: 2rem;
-    justify-content: center;
-}
-
-.error-message {
-    color: #dc3545;
-    font-size: 0.875rem;
-    margin-top: 0.25rem;
-}
-
-.alert-success {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
-
-.alert-error {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
-
-@media (max-width: 768px) {
-    .form-actions {
-        flex-direction: column;
+{% block extra_js %}
+<script>
+    function increaseQuantity(fieldId) {
+        const input = document.getElementById(fieldId);
+        if (input) {
+            const currentValue = parseInt(input.value) || 0;
+            input.value = currentValue + 1;
+            input.dispatchEvent(new Event('change'));
+        }
     }
-}
-</style>
+    
+    function decreaseQuantity(fieldId) {
+        const input = document.getElementById(fieldId);
+        if (input) {
+            const currentValue = parseInt(input.value) || 0;
+            if (currentValue > 0) {
+                input.value = currentValue - 1;
+                input.dispatchEvent(new Event('change'));
+            }
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Form validation
+        const forms = document.querySelectorAll('.needs-validation');
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+
+        // Auto-focus first field
+        const firstSelect = document.querySelector('select[name="producto"]');
+        if (firstSelect) {
+            firstSelect.focus();
+        }
+
+        // Quantity input validation
+        const quantityInputs = document.querySelectorAll('input[name="stock_actual"], input[name="stock_minimo"]');
+        quantityInputs.forEach(input => {
+            input.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/[^0-9]/g, '');
+                if (value === '') value = '0';
+                e.target.value = parseInt(value);
+            });
+        });
+
+        // Stock validation
+        const stockActualInput = document.querySelector('input[name="stock_actual"]');
+        const stockMinimoInput = document.querySelector('input[name="stock_minimo"]');
+        
+        function validateStock() {
+            if (stockActualInput && stockMinimoInput) {
+                const actual = parseInt(stockActualInput.value) || 0;
+                const minimo = parseInt(stockMinimoInput.value) || 0;
+                
+                // Remove previous alerts
+                const existingAlert = document.querySelector('.dynamic-stock-alert');
+                if (existingAlert) {
+                    existingAlert.remove();
+                }
+                
+                if (actual < minimo && actual > 0) {
+                    showStockAlert('El stock actual está por debajo del mínimo recomendado', 'warning');
+                } else if (actual === 0) {
+                    showStockAlert('El producto estará sin stock', 'danger');
+                }
+            }
+        }
+        
+        function showStockAlert(message, type) {
+            const alertHtml = `
+                <div class="alert alert-${type} dynamic-stock-alert" role="alert">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    ${message}
+                </div>
+            `;
+            const form = document.querySelector('form');
+            form.insertAdjacentHTML('afterbegin', alertHtml);
+        }
+        
+        if (stockActualInput) stockActualInput.addEventListener('change', validateStock);
+        if (stockMinimoInput) stockMinimoInput.addEventListener('change', validateStock);
+
+        console.log('Inventory form loaded successfully');
+    });
+</script>
 {% endblock %}
