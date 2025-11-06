@@ -171,7 +171,7 @@ __marimo__/
 # Django specific
 media/
 staticfiles/
-static/
+# static/ - Comentado para permitir subir archivos estáticos del proyecto
 
 # Database
 *.sqlite3

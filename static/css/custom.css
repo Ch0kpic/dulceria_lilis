@@ -1,0 +1,492 @@
+/* ===== DULCERÍA LILIS CUSTOM STYLES ===== */
+
+/* Variables CSS para colores principales */
+:root {
+  /* Colores del logo */
+  --lilis-red: #E53E3E;
+  --lilis-red-hover: #C53030;
+  --lilis-red-light: #FED7D7;
+  
+  /* Azul principal para botones */
+  --lilis-blue: #4F81F7;
+  --lilis-blue-hover: #3182CE;
+  --lilis-blue-light: #EBF8FF;
+  
+  /* Colores neutros */
+  --lilis-gray-100: #F7FAFC;
+  --lilis-gray-200: #EDF2F7;
+  --lilis-gray-300: #E2E8F0;
+  --lilis-gray-400: #CBD5E0;
+  --lilis-gray-500: #A0AEC0;
+  --lilis-gray-600: #718096;
+  --lilis-gray-700: #4A5568;
+  --lilis-gray-800: #2D3748;
+  --lilis-gray-900: #1A202C;
+  
+  /* Verde para éxito */
+  --lilis-green: #48BB78;
+  --lilis-green-hover: #38A169;
+  
+  /* Amarillo para advertencias */
+  --lilis-yellow: #ED8936;
+  --lilis-yellow-hover: #DD6B20;
+  --lilis-yellow-light: #FEFCBF;
+  --lilis-yellow-dark: #B7791F;
+  
+  /* Púrpura para gestión de usuarios */
+  --lilis-purple: #9333EA;
+  --lilis-purple-hover: #7C3AED;
+  --lilis-purple-light: #F3E8FF;
+  --lilis-purple-dark: #6B21A8;
+  
+  /* Colores adicionales para estados */
+  --lilis-green-light: #F0FFF4;
+  --lilis-green-dark: #22543D;
+  --lilis-red-dark: #742A2A;
+  --lilis-blue-dark: #2A4365;
+  
+  /* Sombras */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Reset y configuración base */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--lilis-gray-100);
+  color: var(--lilis-gray-800);
+  line-height: 1.6;
+}
+
+/* ===== COMPONENTES PRINCIPALES ===== */
+
+/* Header personalizado */
+.lilis-header {
+  background: linear-gradient(135deg, var(--lilis-red) 0%, #D53F3F 100%);
+  box-shadow: var(--shadow-lg);
+  padding: 1rem 0;
+}
+
+.lilis-logo {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: contain;
+}
+
+.lilis-brand {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+  text-decoration: none;
+  margin-left: 0.75rem;
+}
+
+.lilis-brand:hover {
+  color: white;
+  text-decoration: none;
+}
+
+/* Cards principales */
+.lilis-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--lilis-gray-200);
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.lilis-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-1px);
+}
+
+.lilis-card-header {
+  background: var(--lilis-gray-50);
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--lilis-gray-200);
+}
+
+.lilis-card-body {
+  padding: 1.5rem;
+}
+
+.lilis-card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--lilis-gray-800);
+  margin: 0;
+}
+
+/* Login card especial */
+.lilis-login-card {
+  max-width: 400px;
+  margin: 2rem auto;
+  background: white;
+  border-radius: 16px;
+  box-shadow: var(--shadow-xl);
+  overflow: hidden;
+}
+
+.lilis-login-header {
+  text-align: center;
+  padding: 2rem 2rem 1rem;
+  background: linear-gradient(135deg, var(--lilis-gray-50) 0%, white 100%);
+}
+
+.lilis-login-logo {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1rem;
+  border-radius: 50%;
+  box-shadow: var(--shadow-md);
+}
+
+.lilis-login-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--lilis-gray-800);
+  margin-bottom: 0.5rem;
+}
+
+.lilis-login-subtitle {
+  color: var(--lilis-gray-600);
+  font-size: 0.875rem;
+}
+
+/* Botones personalizados */
+.btn-lilis-primary {
+  background: var(--lilis-blue);
+  border: none;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-lilis-primary:hover {
+  background: var(--lilis-blue-hover);
+  color: white;
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.btn-lilis-primary:focus {
+  box-shadow: 0 0 0 3px var(--lilis-blue-light);
+}
+
+.btn-lilis-secondary {
+  background: var(--lilis-gray-100);
+  border: 1px solid var(--lilis-gray-300);
+  color: var(--lilis-gray-700);
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-lilis-secondary:hover {
+  background: var(--lilis-gray-200);
+  color: var(--lilis-gray-800);
+  border-color: var(--lilis-gray-400);
+}
+
+.btn-lilis-danger {
+  background: var(--lilis-red);
+  border: none;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.btn-lilis-danger:hover {
+  background: var(--lilis-red-hover);
+  color: white;
+}
+
+.btn-lilis-success {
+  background: var(--lilis-green);
+  border: none;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.btn-lilis-success:hover {
+  background: var(--lilis-green-hover);
+  color: white;
+}
+
+/* Formularios */
+.lilis-form-group {
+  margin-bottom: 1.25rem;
+}
+
+.lilis-form-label {
+  display: block;
+  font-weight: 500;
+  color: var(--lilis-gray-700);
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.lilis-form-control {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--lilis-gray-300);
+  border-radius: 8px;
+  background: white;
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
+}
+
+.lilis-form-control:focus {
+  outline: none;
+  border-color: var(--lilis-blue);
+  box-shadow: 0 0 0 3px var(--lilis-blue-light);
+}
+
+.lilis-form-control::placeholder {
+  color: var(--lilis-gray-400);
+}
+
+/* Navegación por pasos */
+.lilis-steps {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  background: white;
+  padding: 1rem;
+  border-radius: 10px;
+  box-shadow: var(--shadow-sm);
+}
+
+.lilis-step {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: var(--lilis-gray-500);
+  transition: all 0.2s ease;
+}
+
+.lilis-step.active {
+  background: var(--lilis-blue);
+  color: white;
+}
+
+.lilis-step.completed {
+  background: var(--lilis-green);
+  color: white;
+}
+
+.lilis-step-number {
+  background: currentColor;
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-right: 0.5rem;
+}
+
+.lilis-step.active .lilis-step-number,
+.lilis-step.completed .lilis-step-number {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Tablas */
+.lilis-table {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.lilis-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.lilis-table th {
+  background: var(--lilis-gray-50);
+  padding: 1rem 1.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--lilis-gray-700);
+  text-align: left;
+  border-bottom: 1px solid var(--lilis-gray-200);
+}
+
+.lilis-table td {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--lilis-gray-100);
+  font-size: 0.875rem;
+}
+
+.lilis-table tr:hover {
+  background: var(--lilis-gray-50);
+}
+
+/* Badges/Estados */
+.lilis-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.lilis-badge-success {
+  background: var(--lilis-green);
+  color: white;
+}
+
+.lilis-badge-warning {
+  background: var(--lilis-yellow);
+  color: white;
+}
+
+.lilis-badge-danger {
+  background: var(--lilis-red);
+  color: white;
+}
+
+.lilis-badge-info {
+  background: var(--lilis-blue);
+  color: white;
+}
+
+.lilis-badge-secondary {
+  background: var(--lilis-gray-400);
+  color: white;
+}
+
+/* Alertas */
+.lilis-alert {
+  padding: 1rem 1.25rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  border-left: 4px solid;
+}
+
+.lilis-alert-info {
+  background: var(--lilis-blue-light);
+  border-left-color: var(--lilis-blue);
+  color: var(--lilis-blue-hover);
+}
+
+.lilis-alert-success {
+  background: #F0FFF4;
+  border-left-color: var(--lilis-green);
+  color: var(--lilis-green-hover);
+}
+
+.lilis-alert-warning {
+  background: #FFFAF0;
+  border-left-color: var(--lilis-yellow);
+  color: var(--lilis-yellow-hover);
+}
+
+.lilis-alert-danger {
+  background: var(--lilis-red-light);
+  border-left-color: var(--lilis-red);
+  color: var(--lilis-red-hover);
+}
+
+/* Utilidades */
+.text-lilis-red {
+  color: var(--lilis-red);
+}
+
+.text-lilis-blue {
+  color: var(--lilis-blue);
+}
+
+.bg-lilis-red {
+  background-color: var(--lilis-red);
+}
+
+.bg-lilis-blue {
+  background-color: var(--lilis-blue);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .lilis-steps {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .lilis-card-body {
+    padding: 1rem;
+  }
+  
+  .lilis-login-card {
+    margin: 1rem;
+  }
+  
+  .lilis-table th,
+  .lilis-table td {
+    padding: 0.75rem 1rem;
+  }
+}
+
+/* Animaciones */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.lilis-fade-in {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+/* Estados de carga */
+.lilis-loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.lilis-spinner {
+  border: 2px solid var(--lilis-gray-200);
+  border-top: 2px solid var(--lilis-blue);
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+  margin-right: 0.5rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
